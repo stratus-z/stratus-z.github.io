@@ -123,7 +123,7 @@
     
     <!--- Seo Part-->
     
-    <link rel="canonical" href="https://stratus-z.github.io/404.html"/>
+    <link rel="canonical" href="https://stratus-z.github.io/2025/12/09/2025-buaa-oopre-反思与总结/"/>
     <meta name="robots" content="index,follow">
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
@@ -132,13 +132,15 @@
     
         
         <meta name="description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Page Not Found">
-<meta property="og:url" content="https://stratus-z.github.io/404.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2025-BUAA-OOpre 反思与总结">
+<meta property="og:url" content="https://stratus-z.github.io/2025/12/09/2025-BUAA-OOpre-%E5%8F%8D%E6%80%9D%E4%B8%8E%E6%80%BB%E7%BB%93/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://stratus-z.github.io/images/redefine-og.webp">
+<meta property="article:published_time" content="2025-12-09T14:39:40.000Z">
+<meta property="article:modified_time" content="2025-12-09T14:56:41.279Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://stratus-z.github.io/images/redefine-og.webp">
@@ -153,7 +155,7 @@
     
     <title>
         
-            Page Not Found | Stratus
+            2025-BUAA-OOpre 反思与总结 | Stratus
         
     </title>
 
@@ -532,15 +534,241 @@
 			
 
 			<div class="main-content">
-				<div class="nf-container">
-    <div class="nf-text">
-        <h1>404<br>Page Not Found</h1>
-    </div>
-    <div class="nf-button">
-        <a href="/" class="button large center"><i class="fa-regular fa-house"></i> Go Back Home</a>
-    </div>
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">2025-BUAA-OOpre 反思与总结</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">Zeng Yue</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv1</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2025-12-09 22:39:40</span>
+        <span class="mobile">2025-12-09 22:39:40</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-09 22:56:41</span>
+            <span class="mobile">2025-12-09 22:56:41</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
 </div>
 
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h2 id="一、有关代码的总结"><a href="#一、有关代码的总结" class="headerlink" title="一、有关代码的总结"></a>一、有关代码的总结</h2><h3 id="1、作业最终的架构设计"><a href="#1、作业最终的架构设计" class="headerlink" title="1、作业最终的架构设计"></a>1、作业最终的架构设计</h3><p>在经过一系列的迭代和调整后，本人的作业最终的架构设计为：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/%5Cimages%5Csrc.png"
+                      alt="架构"
+                ></p>
+<p>下面我将结合这张IDEA自动生成的关系图来详细讲解我的最终架构。</p>
+<p><strong>物品系统：</strong></p>
+<p><code>Item</code>：所有物品的接口，定义了所有物品的共同行为，<code>Equipment</code>和<code>Bottle</code>都实现了这个接口</p>
+<ul>
+<li><p><code>Equipment</code>：装备类，定义了装备所具有的共同属性和共同行为</p>
+<ul>
+<li><code>Weapon</code>：武器类，继承自<code>Equipment</code><ul>
+<li><code>Sword</code>：剑，继承自<code>Weapon</code></li>
+<li><code>Magicbook</code>：魔法书，继承自<code>Weapon</code></li>
+</ul>
+</li>
+<li><code>Armour</code>：装甲类，继承自<code>Equipment</code></li>
+</ul>
+</li>
+<li><p><code>Bottle</code>：药水类，定义了药水所具备的共同属性和共同行为</p>
+<ul>
+<li><code>DefBottle</code></li>
+<li><code>ManaBottle</code></li>
+<li><code>AtkBottle</code></li>
+<li><code>HpBottle</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>法术系统：</strong></p>
+<p><code>Spell</code>：法术类，定义了所有法术的共同属性和行为</p>
+<ul>
+<li><code>HealSpell</code></li>
+<li><code>AttackSpell</code></li>
+</ul>
+<p><strong>角色系统：</strong></p>
+<p><code>Adventurer</code>：冒险者类，实现了<code>Employer</code>和<code>Employee</code>两个接口，表明一个冒险者既可以是别人的雇主，也可以是别人的雇员</p>
+<p><strong>基础模块：</strong></p>
+<p><code>MainClass</code>：处理输入，将输入处理为数组并传入<code>Games</code>启动游戏</p>
+<p><code>Games</code>：核心模块，根据处理后的输入依次处理指令，并执行相关操作</p>
+<p><code>Factory</code>：工厂类，用于创建所需的<code>Item</code></p>
+<p><code>Lexer</code>：词法分析类，用于处理<code>lr</code>指令中操作</p>
+<p>程序的入口在<code>MainClass</code>类中，通过该类启动程序并输入操作指令，然后通过核心模块<code>Games</code>处理输入，调用方法，实现游戏功能。</p>
+<h3 id="2、迭代中的架构调整及考虑"><a href="#2、迭代中的架构调整及考虑" class="headerlink" title="2、迭代中的架构调整及考虑"></a>2、迭代中的架构调整及考虑</h3><h4 id="第一次迭代"><a href="#第一次迭代" class="headerlink" title="第一次迭代"></a>第一次迭代</h4><p>此次迭代是在原有基础上为冒险者增加一些属性，并新增背包系统，丰富药水瓶的种类。因此，在这次迭代中引入了继承机制，便于对药水的管理。而对于背包系统，我则是选择在物品属性中新增<code>Usable</code>并添加相关管理方法，这也为后期的大重构埋下了伏笔。</p>
+<h4 id="第二次迭代"><a href="#第二次迭代" class="headerlink" title="第二次迭代"></a>第二次迭代</h4><p>这次迭代加入了战斗机制，丰富了装备种类，并对背包系统进行了完善。其中，加入战斗机制只需要添加相应的方法即可，丰富装备种类也只是继承，而完善背包系统却导致了整个代码的大重构，其中很大的原因是由于第一次迭代的偷懒。这次迭代的重构我将原来用于存储所有冒险者的<code>ArrayList</code>容器改成了<code>HashMap</code>，同时在冒险者类中加入了完整的背包系统，其中的药水栏借助队列<code>Queue</code>实现。但在这次重构中，由于我的疏忽，并未对背包实现完整的管理，导致程序出现bug，没有通过强测。</p>
+<h4 id="第三次迭代"><a href="#第三次迭代" class="headerlink" title="第三次迭代"></a>第三次迭代</h4><p>第三次迭代要求加入雇佣关系和相关限制，并引入了观察者模式。在引入雇佣关系限制的时候，最关键的一点在于异常指令判断与雇佣关系限制判断的优先级。引入的观察者模式则可以非常自然的实现救援这一过程。</p>
+<h4 id="第四次迭代"><a href="#第四次迭代" class="headerlink" title="第四次迭代"></a>第四次迭代</h4><p>这次迭代只新增了<code>lr</code>指令，但是我们需要使用递归下降的思想来实现指令的正则化处理。在这次迭代中，我选择使用递归来实现多重关系的导入。</p>
+<h2 id="二、使用JUnit的心得体会"><a href="#二、使用JUnit的心得体会" class="headerlink" title="二、使用JUnit的心得体会"></a>二、使用JUnit的心得体会</h2><p>使用<code>JUnit</code>的目的是来测试我们自己编写的代码功能是否正常，而作业中对<code>JUnit</code>有着覆盖率的要求，这在很大程度上促使我们去更加全面的测试自己的代码。一方面，方法覆盖率需要我们尽可能的将所有的方法都覆盖，也就是说我们要尽可能全面的测试所有类型的指令；另一方面，分支覆盖率提醒我们要考虑到每一条指令的多种情况，这在很大程度上帮我测出了一些潜在的bug。在写<code>JUnit</code>测试的过程中，我也体会到，通过测试顶层的方法，它能够调用下层方法并覆盖，因此在写测试时，我们应优先测试顶层方法，然后再逐步完善测试未被覆盖的方法。同时，在编写<code>JUnit</code>代码中的一次重复度较高的部分，我尝试利用C语言程序简单实现了测试指令自动化转测试代码，这在一定程度上加快了我的<code>JUnit</code>代码的编写。</p>
+<h2 id="三、学习OOPre的心得体会"><a href="#三、学习OOPre的心得体会" class="headerlink" title="三、学习OOPre的心得体会"></a>三、学习OOPre的心得体会</h2><p>学习OOPre的过程并没有想象中的那么难，其关键在于编程思想的转变。之前面向过程编程侧重于算法和步骤，基本单位是函数，而面向过程编程则侧重于数据和关系，基本单位是类，这一转变让我能更好的专注于程序的功能，而不是它是怎么实现的，通过类的封装，我们只要把那些方法当成黑箱即可。</p>
+<p>同时，面向对象里的继承机制极大的方便了对于不同对象的处理，也更能清晰的展示不同对象之间的关系。在学习OOPre的过程中，我们也学习了一些模式如工厂模式、观察者模式等，这些不同的模式有着各自擅长处理的方法和使用场景，通过选用合适的模式，我们的程序逻辑可以更加清晰，功能也不容易出错。除此之外，面向对象的编程模式让我们更加方便添加新的功能和方法，这是因为面向对象是抽象建模的过程，在添加新功能迭代的时候，我们可以直接按照人的思维来实现。</p>
+<p>在编写作业程序时，我们封装了多个类，每个类各行其职，代码的整体逻辑十分明了。在编写核心程序的过程就像是搭积木，把其他类的方法按照逻辑依次调用，“拼装”成我们想要的程序。还让我感触很深的一点就是，对于之前从未接触过的Java语言，上手竟然如此容易，这也验证编程的关键不在于编程语言，而在于编程的思维。而且，借助编译器自带的代码提示工具，我们上手一门陌生编程语言的门槛越来越低。</p>
+<h2 id="四、对OOPre课程的简单建议"><a href="#四、对OOPre课程的简单建议" class="headerlink" title="四、对OOPre课程的简单建议"></a>四、对OOPre课程的简单建议</h2><ul>
+<li>建议在Pre课程开始前提供一点Pre的Pre，比如简单Java程序设计，帮助大家提前适应Java编程。</li>
+<li>建议<code>JUnit</code>的教程可以再详细一点</li>
+</ul>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> 2025-BUAA-OOpre 反思与总结</li>
+        <li><strong>Author:</strong> Zeng Yue</li>
+        <li><strong>Created at
+                :</strong> 2025-12-09 22:39:40</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2025-12-09 22:56:41
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://redefine.ohevan.com/2025/12/09/2025-BUAA-OOpre-反思与总结/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a>.
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2025/08/08/hello-world/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Hello World</span>
+						<span class="post-nav-item">Next posts</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        Comments
+    </div>
+    
+
+        
+            
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '/js/libs/waline.mjs';
+
+      function loadWaline() {
+        init({
+          el: '#waline',
+          serverURL: 'https://stratus-z.vercel.app/',
+          dark: 'body[class~="dark-mode"]',
+          reaction: true,
+          requiredMeta: ['nick', 'mail'],
+          emoji: [],
+                    lang: 'zh-CN',
+        });
+      }
+
+      if (typeof swup !== 'undefined') {
+        loadWaline();
+      } else {
+        window.addEventListener('DOMContentLoaded', loadWaline);
+      }
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">2025-BUAA-OOpre 反思与总结</div>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%9C%89%E5%85%B3%E4%BB%A3%E7%A0%81%E7%9A%84%E6%80%BB%E7%BB%93"><span class="nav-text">一、有关代码的总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81%E4%BD%9C%E4%B8%9A%E6%9C%80%E7%BB%88%E7%9A%84%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1"><span class="nav-text">1、作业最终的架构设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E8%BF%AD%E4%BB%A3%E4%B8%AD%E7%9A%84%E6%9E%B6%E6%9E%84%E8%B0%83%E6%95%B4%E5%8F%8A%E8%80%83%E8%99%91"><span class="nav-text">2、迭代中的架构调整及考虑</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E4%BD%BF%E7%94%A8JUnit%E7%9A%84%E5%BF%83%E5%BE%97%E4%BD%93%E4%BC%9A"><span class="nav-text">二、使用JUnit的心得体会</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%AD%A6%E4%B9%A0OOPre%E7%9A%84%E5%BF%83%E5%BE%97%E4%BD%93%E4%BC%9A"><span class="nav-text">三、学习OOPre的心得体会</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%AF%B9OOPre%E8%AF%BE%E7%A8%8B%E7%9A%84%E7%AE%80%E5%8D%95%E5%BB%BA%E8%AE%AE"><span class="nav-text">四、对OOPre课程的简单建议</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
 			</div>
 
 			
@@ -618,6 +846,26 @@
 		</div>
 	</div>
 
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
 	
 
 	<div class="right-side-tools-container">
@@ -721,6 +969,7 @@
         containers: ["#swup"],
     });
 </script>
+
 
 
 
