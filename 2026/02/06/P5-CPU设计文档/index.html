@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="Zeng Yue">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="https://stratus-z.github.io/2026/02/06/p5-cpu设计文档/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="P5_CPU设计文档">
+<meta property="og:url" content="https://stratus-z.github.io/2026/02/06/P5-CPU%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://stratus-z.github.io/images/redefine-og.webp">
+<meta property="article:published_time" content="2026-02-06T09:53:45.000Z">
+<meta property="article:modified_time" content="2026-02-06T10:00:09.320Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="CO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://stratus-z.github.io/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/favicon.svg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.svg">
+    <meta name="theme-color" content="#A31F34">
+    <link rel="shortcut icon" href="/images/favicon.svg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            P5_CPU设计文档 | Stratus
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"stratus-z.github.io","root":"/","language":"en","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":"Hexo Theme Redefine, Redefine Your Hexo Journey."},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/wallhaven-rdoovj_1920x1080.png","dark":"/images/wallhaven-1pwmpg_1920x1080.png"},"title":"Stratus Blog","subtitle":{"text":["欢迎来到层云遮蔽下的空间。"],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"style":"default","links":{"github":"https://github.com/stratus-z","instagram":null,"zhihu":null,"twitter":null,"email":null},"qrs":{"weixin":"/images/weixin.png","qq":"/images/QQ.png"}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"11.4.1"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Tags":{"icon":"fa-solid fa-tags","path":"/tags/"},"Archives":{"path":"/archives/","icon":"fa-regular fa-archive"},"Categories":{"path":"/categories/","icon":"fa-regular fa-folder"},"About":{"icon":"fa-regular fa-user","submenus":{"Me":"/about/","Github":"https://github.com/stratus-z"}},"Links":{"icon":"fa-regular fa-link","path":"/links/"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":{"Tags":{"path":"/tags","icon":"fa-regular fa-tags"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2025/8/6 15:14:15"};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                Stratus
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    HOME
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/tags/"
+                                        >
+                                    <i class="fa-solid fa-tags fa-fw"></i>
+                                    TAGS
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives/"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    ARCHIVES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    CATEGORIES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="has-dropdown"
+                                   href="#"
+                                        onClick=&#34;return false;&#34;>
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    ABOUT
+                                    <i class="fa-solid fa-chevron-down fa-fw"></i>
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                                    <ul class="sub-menu">
+                                        
+                                            <li>
+                                                <a href="/about/">
+                                                    ME
+                                                </a>
+                                            </li>
+                                        
+                                            <li>
+                                                <a target="_blank" rel="noopener" href="https://github.com/stratus-z">
+                                                    GITHUB
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/links/"
+                                        >
+                                    <i class="fa-regular fa-link fa-fw"></i>
+                                    LINKS
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                HOME
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/tags/"
+                        >
+                            <span>
+                                TAGS
+                            </span>
+                            
+                                <i class="fa-solid fa-tags fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives/"
+                        >
+                            <span>
+                                ARCHIVES
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                CATEGORIES
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item-sub text-base my-1.5 flex flex-col w-full">
+                        
+                        <div class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary cursor-pointer text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                             navbar-data-toggle="submenu-About"
+                        >
+                            <span>
+                                ABOUT
+                            </span>
+                            
+                                <i class="fa-solid fa-chevron-right fa-sm fa-fw transition-all"></i>
+                            
+                        </div>
+                        
+
+                        
+                            <div class="flex-col items-start px-2 py-2 hidden" data-target="submenu-About">
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           href="/about/">ME</a>
+                                    </div>
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           target="_blank" rel="noopener" href="https://github.com/stratus-z">GITHUB</a>
+                                    </div>
+                                
+                            </div>
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/links/"
+                        >
+                            <span>
+                                LINKS
+                            </span>
+                            
+                                <i class="fa-regular fa-link fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+                
+                    
+                    
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">4</div>
+        <div class="label text-third-text-color text-sm">Tags</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">1</div>
+        <div class="label text-third-text-color text-sm">Categories</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">8</div>
+        <div class="label text-third-text-color text-sm">Posts</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">P5_CPU设计文档</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">Zeng Yue</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv2</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2026-02-06 17:53:45</span>
+        <span class="mobile">2026-02-06 17:53:45</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2026-02-06 18:09</span>
+            <span class="mobile">2026-02-06 18:09</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E4%B8%93%E4%B8%9A%E8%AF%BE/">专业课</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/CO/">CO</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h2 id="一、CPU设计文档"><a href="#一、CPU设计文档" class="headerlink" title="一、CPU设计文档"></a>一、CPU设计文档</h2><h3 id="（一）设计草稿"><a href="#（一）设计草稿" class="headerlink" title="（一）设计草稿"></a>（一）设计草稿</h3><p>本次CPU搭建需要实现的指令有<code>add</code>, <code>sub</code>, <code>ori</code>, <code>lw</code>, <code>sw</code>, <code>beq</code>, <code>lui</code>, <code>jal</code>, <code>jr</code>, <code>nop</code>，而CPU的构成模块有<code>IFU</code>, <code>GRF</code>, <code>ALU</code>, <code>DM</code>, <code>EXT</code>, <code>Controller</code>, <code>NPC</code>, <code>Splitter</code>，主要时基于<code>P4</code>的单周期CPU，将其改装为多周期五级流水线CPU，并实现延迟槽功能。</p>
+<p>在要实现的指令中，I型指令有 <code>ori</code>, <code>lw</code>, <code>sw</code>, <code>beq</code>, <code>lui</code>：</p>
+<table>
+<thead>
+<tr>
+<th align="center">OpCode</th>
+<th align="center">rs</th>
+<th align="center">rt</th>
+<th align="center">imm16</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">6</td>
+<td align="center">5</td>
+<td align="center">5</td>
+<td align="center">16</td>
+</tr>
+</tbody></table>
+<p>R型指令有<code>add</code>, <code>sub</code>, <code>nop</code>, <code>jr</code>：</p>
+<table>
+<thead>
+<tr>
+<th align="center">OpCode</th>
+<th align="center">rs</th>
+<th align="center">rt</th>
+<th align="center">rd</th>
+<th align="center">shamt</th>
+<th align="center">Funct</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">6</td>
+<td align="center">5</td>
+<td align="center">5</td>
+<td align="center">5</td>
+<td align="center">5</td>
+<td align="center">6</td>
+</tr>
+</tbody></table>
+<p>J型指令有<code>jal</code>：</p>
+<table>
+<thead>
+<tr>
+<th align="center">OpCode</th>
+<th align="center">imm26</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">6</td>
+<td align="center">26</td>
+</tr>
+</tbody></table>
+<p>流水线分为<code>F（Fetch）</code>、<code>D（Decode）</code>、<code>E（Execute）</code>、<code>M（Memory）</code>、<code>W（Writeback）</code>五级，分别表示取指阶段、译码阶段、执行阶段、存储阶段、写回阶段，每两级之间有对应的流水线寄存器来传递指令及相关数据，数据流水结构图大体为：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/P5/data_stream.png"
+                      alt="数据流水"
+                ></p>
+<p>各级大致分布和功能为：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/P5/blueprint.png"
+                      alt="流水线蓝图"
+                ></p>
+<table>
+<thead>
+<tr>
+<th align="center">F</th>
+<th align="center">D</th>
+<th align="center">E</th>
+<th align="center">M</th>
+<th align="center">W</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">A</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">B</td>
+<td align="center">A</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">C</td>
+<td align="center">B</td>
+<td align="center">A</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">D</td>
+<td align="center">C</td>
+<td align="center">B</td>
+<td align="center">A</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">D</td>
+<td align="center">C</td>
+<td align="center">B</td>
+<td align="center">A</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">D</td>
+<td align="center">C</td>
+<td align="center">B</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">D</td>
+<td align="center">C</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">D</td>
+</tr>
+</tbody></table>
+<p>单周期CPU配合流水线寄存器改为多周期CPU后，还需要处理冒险的问题，这里用到了转发和阻塞两种方法。按照教程推荐，本人CPU使用AT法来判断是否有冒险问题，选用转发还是阻塞。首先将D、E、M、W四级分别定义为0、1、2、3级，用t_rs和t_rt来表示rs和rt寄存器的值分别会在那个级使用，t表示对应值会在那个级准备好并可以转发，用16进制f表示不会用到或产生该寄存器的值，然后分别减去对应指令当前所在级数，得到t_rs_use、t_rt_use和t_new，进行T值判断，本次添加指令对应的数据为：</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">add</th>
+<th align="center">sub</th>
+<th align="center">ori</th>
+<th align="center">lw</th>
+<th align="center">sw</th>
+<th align="center">beq</th>
+<th align="center">lui</th>
+<th align="center">jal</th>
+<th align="center">jr</th>
+<th align="center">nop</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">t_rs</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">f</td>
+<td align="center">f</td>
+<td align="center">0</td>
+<td align="center">f</td>
+</tr>
+<tr>
+<td align="center">t_rt</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">f</td>
+<td align="center">f</td>
+<td align="center">2</td>
+<td align="center">0</td>
+<td align="center">f</td>
+<td align="center">f</td>
+<td align="center">f</td>
+<td align="center">f</td>
+</tr>
+<tr>
+<td align="center">t</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">3</td>
+<td align="center">f</td>
+<td align="center">f</td>
+<td align="center">2</td>
+<td align="center">0</td>
+<td align="center">f</td>
+<td align="center">f</td>
+</tr>
+</tbody></table>
+<p>然后分析可以找出转发的15种情况：</p>
+<p>1、D_rsData来自$31且上一条为jal	wire D_rsData_from_E_PCplus8;</p>
+<p>2、D_rtData来自$31且上一条为jal	wire D_rtData_from_E_PCplus8;</p>
+<p>3、D_rsData来自$31且上上条为jal	wire D_rsData_from_M_PCplus8;</p>
+<p>4、D_rtData来自$31且上上条为jal	wire D_rtData_from_M_PCplus8;</p>
+<p>5、E_rsData来自$31且上一条为jal	wire E_rsData_from_M_PCplus8;</p>
+<p>6、E_rtData来自$31且上一条为jal	wire E_rtData_from_M_PCplus8;</p>
+<p>7、D_rsData来自上上条指令的非$31目的寄存器	wire D_rsData_from_M;</p>
+<p>8、D_rtData来自上上条指令的非$31目的寄存器	wire D_rtData_from_M;</p>
+<p>9、D_rsData来自上上上条指令的非$31目的寄存器	wire D_rsData_from_W;</p>
+<p>10、D_rtData来自上上上条指令的非$31目的寄存器	wire D_rtData_from_W;</p>
+<p>11、E_rsData来自上一条指令的非$31目的寄存器	wire E_rsData_from_M;</p>
+<p>12、E_rtData来自上一条指令的非$31目的寄存器	wire E_rtData_from_M;</p>
+<p>13、E_rsData来自上上条指令的非$31目的寄存器	wire E_rsData_from_W;</p>
+<p>14、E_rtData来自上上条指令的非$31目的寄存器	wire E_rtData_from_W;</p>
+<p>15、M_rtData来自上一条指令的非$31目的寄存器	wire M_rtData_from_W;</p>
+<p>然后根据对应情况设计转发控制信号和阻塞信号，实现转发和阻塞。流水线的大部分模块与单周期时相同，部分模块稍作改动。</p>
+<h4 id="1、IFU"><a href="#1、IFU" class="headerlink" title="1、IFU"></a>1、<code>IFU</code></h4><p>按照教程要求，<code>IFU</code>内部包括<code>PC</code>和<code>IM</code>的功能，其中<code>PC</code>用寄存器实现，并需要具有同步复位至<code>0x00003000</code>的功能，<code>IM</code>则要求容量为<code>4096 × 32bit</code>。</p>
+<p>对于<code>IM</code>，它保存的内容时待执行代码的二进制码，因此用<code>ROM</code>来实现，由于<code>PC</code>的起始地址为<code>0x00003000</code>，且相邻两条地址相差为4，因此地址<code>PC</code>与<code>ROM</code>中指令地址的对应关系如下：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="C:\Users\13564\Desktop\作业\计组\P3_CPU\未命名绘图.drawio.png"
+                      alt="未命名绘图.drawio"
+                ></p>
+<p>基于<code>P3</code>的<code>Logisim</code>单周期CPU，结合<code>Verilog</code>语言，我将<code>IFU</code>模块翻译并简化，加入课程要求的系统导入<code>code.txt</code>功能，得到对应的核心代码描述为：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">reg</span> [<span class="number">31</span>:<span class="number">0</span>] ROM [<span class="number">0</span>:<span class="number">4095</span>];</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">31</span>:<span class="number">0</span>] regPC;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] InstrAddr;</span><br><span class="line"></span><br><span class="line"><span class="keyword">initial</span> <span class="keyword">begin</span></span><br><span class="line">    <span class="built_in">$readmemh</span>(<span class="string">&quot;code.txt&quot;</span>, ROM, <span class="number">0</span>, <span class="number">4095</span>);</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk) <span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">if</span> (reset) <span class="keyword">begin</span></span><br><span class="line">		regPC &lt;= <span class="number">32&#x27;h3000</span>;</span><br><span class="line">	<span class="keyword">end</span> <span class="keyword">else</span> <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span> (PC_en) <span class="keyword">begin</span></span><br><span class="line">            regPC &lt;= NPC;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> InstrAddr = PC - <span class="number">32&#x27;h3000</span>;</span><br><span class="line"><span class="keyword">assign</span> Instr = ROM[InstrAddr[<span class="number">13</span>:<span class="number">2</span>]];</span><br><span class="line"><span class="keyword">assign</span> PC = regPC;</span><br><span class="line"><span class="keyword">assign</span> PCplus8 = regPC + <span class="number">32&#x27;h8</span>;</span><br></pre></td></tr></table></figure></div>
+
+<p>对应模块的端口的说明为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号名</th>
+<th align="center">方向</th>
+<th align="center">位宽</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">NPC</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">F级<code>NPC</code>模块输出的下一条指令的地址</td>
+</tr>
+<tr>
+<td align="center">clk</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">时钟信号</td>
+</tr>
+<tr>
+<td align="center">reset</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">同步复位信号</td>
+</tr>
+<tr>
+<td align="center">Instr</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center"><code>IM</code>取出的指令</td>
+</tr>
+<tr>
+<td align="center">PC</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">当前指令地址</td>
+</tr>
+<tr>
+<td align="center">PCplus8</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">延迟槽中指令的下一条指令的地址</td>
+</tr>
+</tbody></table>
+<h4 id="2、GRF"><a href="#2、GRF" class="headerlink" title="2、GRF"></a>2、<code>GRF</code></h4><p><code>GRF</code>是通用寄存器组，这次在<code>P4</code>要求的基础上在输出种增加了时间：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">reg</span> [<span class="number">31</span>:<span class="number">0</span>] regs [<span class="number">0</span>:<span class="number">31</span>];</span><br><span class="line"><span class="keyword">integer</span> i;</span><br><span class="line"></span><br><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk) <span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">if</span> (reset) <span class="keyword">begin</span></span><br><span class="line">		<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">32</span>; i = i + <span class="number">1</span>) <span class="keyword">begin</span></span><br><span class="line">			regs[i] &lt;= <span class="number">32&#x27;h0</span>;</span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">	<span class="keyword">end</span> <span class="keyword">else</span> <span class="keyword">begin</span></span><br><span class="line">		<span class="keyword">if</span> (WE) <span class="keyword">begin</span></span><br><span class="line">			<span class="built_in">$display</span>(<span class="string">&quot;%d@%h: $%d &lt;= %h&quot;</span>, <span class="built_in">$time</span>, PC, Waddr, WData);</span><br><span class="line">			<span class="keyword">if</span> (Waddr != <span class="number">5&#x27;b00000</span>) <span class="keyword">begin</span></span><br><span class="line">				regs[Waddr] &lt;= WData;</span><br><span class="line">			<span class="keyword">end</span></span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> RD1 = regs[A1];</span><br><span class="line"><span class="keyword">assign</span> RD2 = regs[A2];</span><br></pre></td></tr></table></figure></div>
+
+<p>对应模块的端口的说明为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号名</th>
+<th align="center">方向</th>
+<th align="center">位宽</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">PC</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">用于输出</td>
+</tr>
+<tr>
+<td align="center">A1</td>
+<td align="center">I</td>
+<td align="center">5</td>
+<td align="center">读寄存器1的地址<code>rs</code></td>
+</tr>
+<tr>
+<td align="center">A2</td>
+<td align="center">I</td>
+<td align="center">5</td>
+<td align="center">读寄存器2的地址<code>rt</code></td>
+</tr>
+<tr>
+<td align="center">Waddr</td>
+<td align="center">I</td>
+<td align="center">5</td>
+<td align="center">写入寄存器的地址</td>
+</tr>
+<tr>
+<td align="center">WData</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">写入寄存器的数据</td>
+</tr>
+<tr>
+<td align="center">clk</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">时钟信号</td>
+</tr>
+<tr>
+<td align="center">reset</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">异步复位信号</td>
+</tr>
+<tr>
+<td align="center">WE</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">写入使能信号</td>
+</tr>
+<tr>
+<td align="center">RD1</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">读寄存器<code>rs</code>的数据</td>
+</tr>
+<tr>
+<td align="center">RD2</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">读寄存器<code>rt</code>的数据</td>
+</tr>
+</tbody></table>
+<h4 id="3、ALU"><a href="#3、ALU" class="headerlink" title="3、ALU"></a>3、<code>ALU</code></h4><p><code>ALU</code>作为算术逻辑单元需要实现加、减、或运算和加载立即数至高位的功能，这些功能可以通过多路选择器来实现选择输出。用于选择运算的<code>ALU_op</code>为两位，000时选择加法运算，001时选择减法运算，010时选择或运算，011时选择加载至高位，其他时上方<code>out</code>输出为<code>32&#39;h00000000</code>，表示不需要用到上方输出，同时便于后续扩展。按照此逻辑，原来的<code>ALU</code>模块可以调整为：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">parameter</span> ADD = <span class="number">3&#x27;b000</span>,</span><br><span class="line">		  SUB = <span class="number">3&#x27;b001</span>,</span><br><span class="line">		  OR = <span class="number">3&#x27;b010</span>,</span><br><span class="line">		  LUI = <span class="number">3&#x27;b011</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] Add;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] Sub;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] Or;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] Lui;</span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> Add = in1 + in2;</span><br><span class="line"><span class="keyword">assign</span> Sub = in1 - in2;</span><br><span class="line"><span class="keyword">assign</span> Or = in1 | in2;</span><br><span class="line"><span class="keyword">assign</span> Lui = &#123;imm16, <span class="number">16&#x27;h0000</span>&#125;;</span><br><span class="line"><span class="keyword">assign</span> out = (ALU_op == ADD) ? Add :</span><br><span class="line">			 (ALU_op == SUB) ? Sub :</span><br><span class="line">			 (ALU_op == OR) ? Or :</span><br><span class="line">			 (ALU_op == LUI) ? Lui :</span><br><span class="line">			 <span class="number">32&#x27;h00000000</span>;</span><br></pre></td></tr></table></figure></div>
+
+<p>对应端口说明为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号名</th>
+<th align="center">方向</th>
+<th align="center">位宽</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">in1</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">输入待操作数1</td>
+</tr>
+<tr>
+<td align="center">in2</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">输入待操作数2</td>
+</tr>
+<tr>
+<td align="center">imm16</td>
+<td align="center">I</td>
+<td align="center">16</td>
+<td align="center">输入16位立即数</td>
+</tr>
+<tr>
+<td align="center">ALU_op</td>
+<td align="center">I</td>
+<td align="center">3</td>
+<td align="center"><code>ALU</code>控制信号</td>
+</tr>
+<tr>
+<td align="center">out</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">运算结果</td>
+</tr>
+</tbody></table>
+<h4 id="4、NPC"><a href="#4、NPC" class="headerlink" title="4、NPC"></a>4、<code>NPC</code></h4><p><code>NPC</code>模块是根据当前地址和操作，处理得到下一条指令的地址。根据相邻两条地址相差4，如果指令中没有转跳，下一条指令地址即为当前地址加4，否则，如果为<code>beq</code>转跳，则为当前指令地址直接加上指令跳转的相对偏移量<code>offset</code>，如果为绝对跳转指令，输出<code>NPC</code>就是绝对跳转指令的目标地址，根据此逻辑得到代码：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] sign_offset;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] adder0;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] adder1;</span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> sign_offset = &#123;&#123;<span class="number">14</span>&#123;offset[<span class="number">15</span>]&#125;&#125;, offset, <span class="number">2&#x27;b00</span>&#125;;</span><br><span class="line"><span class="keyword">assign</span> adder0 = PC + <span class="number">32&#x27;h00000004</span>;</span><br><span class="line"><span class="keyword">assign</span> adder1 = PC + sign_offset;</span><br><span class="line"><span class="keyword">assign</span> NPC = (jump == <span class="number">1</span>) ? dst :</span><br><span class="line">			 (branch == <span class="number">1</span>) ? adder1 :</span><br><span class="line">			 adder0;</span><br></pre></td></tr></table></figure></div>
+
+<p>端口说明为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号名</th>
+<th align="center">方向</th>
+<th align="center">位宽</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">PC</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">当前指令地址</td>
+</tr>
+<tr>
+<td align="center">offset</td>
+<td align="center">I</td>
+<td align="center">16</td>
+<td align="center">跳转的相对偏移量</td>
+</tr>
+<tr>
+<td align="center">dst</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">绝对跳转的目标地址</td>
+</tr>
+<tr>
+<td align="center">branch</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">1表示要相对跳转，0表示不要</td>
+</tr>
+<tr>
+<td align="center">jump</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">1表示要绝对跳转，0表示不要</td>
+</tr>
+<tr>
+<td align="center">NPC</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">下一条指令地址</td>
+</tr>
+</tbody></table>
+<h4 id="5、DM"><a href="#5、DM" class="headerlink" title="5、DM"></a>5、<code>DM</code></h4><p><code>DM</code>模块与<code>IM</code>部分类似，依旧使用寄存器数组来实现，输出较P4增加时间。对应核心部分为：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">reg</span> [<span class="number">31</span>:<span class="number">0</span>] RAM [<span class="number">0</span>:<span class="number">3071</span>];</span><br><span class="line"><span class="keyword">integer</span> i;</span><br><span class="line"></span><br><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk) <span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">if</span> (reset) <span class="keyword">begin</span></span><br><span class="line">		<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">3072</span>; i = i + <span class="number">1</span>) <span class="keyword">begin</span></span><br><span class="line">			RAM[i] &lt;= <span class="number">32&#x27;h0</span>;</span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">	<span class="keyword">end</span> <span class="keyword">else</span> <span class="keyword">begin</span></span><br><span class="line">		<span class="keyword">if</span> (WR) <span class="keyword">begin</span></span><br><span class="line">			<span class="built_in">$display</span>(<span class="string">&quot;%d@%h: *%h &lt;= %h&quot;</span>, <span class="built_in">$time</span>, PC, Addr, WD);</span><br><span class="line">			RAM[Addr[<span class="number">13</span>:<span class="number">2</span>]] &lt;= WD;</span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> RD = RAM[Addr[<span class="number">13</span>:<span class="number">2</span>]];</span><br></pre></td></tr></table></figure></div>
+
+<p>对应端口说明为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号名</th>
+<th align="center">方向</th>
+<th align="center">位宽</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">PC</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">用于输出对应指令地址</td>
+</tr>
+<tr>
+<td align="center">Addr</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">写入或读取的地址</td>
+</tr>
+<tr>
+<td align="center">WD</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">写入的数据</td>
+</tr>
+<tr>
+<td align="center">WR</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">0表示读，1表示写</td>
+</tr>
+<tr>
+<td align="center">clk</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">时钟信号</td>
+</tr>
+<tr>
+<td align="center">reset</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">异步复位信号</td>
+</tr>
+<tr>
+<td align="center">RD</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">读取的数据</td>
+</tr>
+</tbody></table>
+<h4 id="6、Controller"><a href="#6、Controller" class="headerlink" title="6、Controller"></a>6、<code>Controller</code></h4><p><code>Controller</code>模块用于处理当前的指令类型，并输出控制信息，协调其他模块一起实现指令要求的功能。在这个基础上，该模块还新增了时间t_rs、t_rt、t的输出。根据指令集和相关指令的功能，得到一张控制信号输入输出关系对应表：</p>
+<table>
+<thead>
+<tr>
+<th align="center">指令</th>
+<th align="center">OpCode</th>
+<th align="center">RegDst</th>
+<th align="center">ALUSrc</th>
+<th align="center">MemtoReg</th>
+<th align="center">RegWrite</th>
+<th align="center">MemWrite</th>
+<th align="center">beq</th>
+<th align="center">ExtOp</th>
+<th align="center">ALU_op</th>
+<th align="center">jal</th>
+<th align="center">jr</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">add</td>
+<td align="center">000000</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">000</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">sub</td>
+<td align="center">000000</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">001</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">ori</td>
+<td align="center">001101</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">010</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">lw</td>
+<td align="center">100011</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">000</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">sw</td>
+<td align="center">101011</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">000</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">beq</td>
+<td align="center">000100</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">001</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">lui</td>
+<td align="center">001111</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">011</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">jal</td>
+<td align="center">000011</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">000</td>
+<td align="center">1</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">jr</td>
+<td align="center">000000</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">000</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+</tbody></table>
+<p>其中，<code>add</code>（100000 ）、<code>sub</code>（100010）和<code>jr</code>（001000）还需要根据<code>Funct</code>来区分。基于原有的<code>Logisim</code>模块和<code>Verilog</code>语言的特点，得到实现代码：</p>
+<p>其端口说明为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号名</th>
+<th align="center">方向</th>
+<th align="center">位宽</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Funct</td>
+<td align="center">I</td>
+<td align="center">6</td>
+<td align="center">输入Instr[5:0]</td>
+</tr>
+<tr>
+<td align="center">OpCode</td>
+<td align="center">I</td>
+<td align="center">6</td>
+<td align="center">输入Instr[31:26]</td>
+</tr>
+<tr>
+<td align="center">RegDst</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center"><code>GRF</code>写选择信号，0表示<code>rt</code>，1表示<code>rd</code></td>
+</tr>
+<tr>
+<td align="center">ALUSrc</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center"><code>ALU</code>输入信号选择，0表示<code>in2</code>为<code>RD2</code>，1表示<code>in2</code>为扩展后的<code>imm16</code></td>
+</tr>
+<tr>
+<td align="center">MemtoReg</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center"><code>GRF</code>输入数据选择信号，0表示来自<code>ALU</code>，1表示来自<code>DM</code></td>
+</tr>
+<tr>
+<td align="center">RegWrite</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center"><code>GRF</code>写使能信号</td>
+</tr>
+<tr>
+<td align="center">MemWrite</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center"><code>DM</code>读写使能信号</td>
+</tr>
+<tr>
+<td align="center">beq</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center">1表示当前指令为<code>beq</code></td>
+</tr>
+<tr>
+<td align="center">ExtOp</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center">扩展选择信号，0为零扩展，1为符号扩展</td>
+</tr>
+<tr>
+<td align="center">ALU_op</td>
+<td align="center">O</td>
+<td align="center">3</td>
+<td align="center">ALU的操作码</td>
+</tr>
+<tr>
+<td align="center">jal</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center">1表示当前指令为<code>jal</code>，<code>GRF</code>输入数据选择为PC+4，输入地址为31，<code>NPC</code>输出为<code>dst</code>，来自<code>imm26</code>处理后</td>
+</tr>
+<tr>
+<td align="center">jr</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center">1表示当前指令为<code>jr</code>，<code>NPC</code>输出为<code>dst</code>，来自<code>GRF[rs]</code></td>
+</tr>
+<tr>
+<td align="center">t_rs</td>
+<td align="center">O</td>
+<td align="center">4</td>
+<td align="center"><code>rs</code>寄存器中值在对应指令被使用的级数</td>
+</tr>
+<tr>
+<td align="center">t_rt</td>
+<td align="center">O</td>
+<td align="center">4</td>
+<td align="center"><code>rt</code>寄存器中值在对应指令被使用的级数</td>
+</tr>
+<tr>
+<td align="center">t</td>
+<td align="center">O</td>
+<td align="center">4</td>
+<td align="center"><code>RegAddr</code>对应寄存器中的新值何时可以转发</td>
+</tr>
+</tbody></table>
+<h4 id="7、CMP"><a href="#7、CMP" class="headerlink" title="7、CMP"></a>7、<code>CMP</code></h4><p>该模块来自原来的<code>ALU</code>模块，单独拆分出来是为了方便将其提前到D级，因此该模块也较为简单：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> CMP(</span><br><span class="line">    <span class="keyword">input</span> [<span class="number">31</span>:<span class="number">0</span>] in1,</span><br><span class="line">    <span class="keyword">input</span> [<span class="number">31</span>:<span class="number">0</span>] in2,</span><br><span class="line">    <span class="keyword">output</span> equal</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> equal = (in1 == in2) ? <span class="number">1&#x27;b1</span> : <span class="number">1&#x27;b0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure></div>
+
+<h4 id="8、EXT"><a href="#8、EXT" class="headerlink" title="8、EXT"></a>8、<code>EXT</code></h4><p>该模块主要是实现符号扩展和零扩展的选择，也较为简单：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] zero;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] sign;</span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> zero = &#123;&#123;<span class="number">16</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;, imm16&#125;;</span><br><span class="line"><span class="keyword">assign</span> sign = &#123;&#123;<span class="number">16</span>&#123;imm16[<span class="number">15</span>]&#125;&#125;, imm16&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> imm32 = (ExtOp == <span class="number">0</span>) ? zero : sign;</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="（二）测试方案"><a href="#（二）测试方案" class="headerlink" title="（二）测试方案"></a>（二）测试方案</h3><p>参照实验教程，利用<code>Mars</code>实现程序的验证，通过<code>ISE</code>仿真输出和<code>Mars</code>运行流程，匹配仿真输出和<code>Mars</code>行为来判断当前功能是否正确。根据教程提供的<code>p5_testcode.txt</code>，将其翻译为对应的MIPS代码：</p>
+<div class="code-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">.text</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">28</span>, $<span class="number">0</span>, <span class="number">0</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">29</span>, $<span class="number">0</span>, <span class="number">0</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">1</span>, $<span class="number">0</span>, <span class="number">4112</span></span><br><span class="line"><span class="keyword">lui </span>$<span class="number">2</span>, <span class="number">34595</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">3</span>, $<span class="number">0</span>, <span class="number">30806</span></span><br><span class="line"><span class="keyword">lui </span>$<span class="number">4</span>, <span class="number">34303</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">5</span>, $<span class="number">0</span>, <span class="number">1</span></span><br><span class="line"><span class="keyword">lui </span>$<span class="number">6</span>, <span class="number">65535</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">7</span>, $<span class="number">0</span>, <span class="number">65535</span></span><br><span class="line"><span class="keyword">add </span>$<span class="number">1</span>, $<span class="number">1</span>, $<span class="number">2</span></span><br><span class="line"><span class="keyword">add </span>$<span class="number">9</span>, $<span class="number">1</span>, $<span class="number">3</span></span><br><span class="line"><span class="keyword">sub </span>$<span class="number">8</span>, $<span class="number">1</span>, $<span class="number">2</span></span><br><span class="line"><span class="keyword">sub </span>$<span class="number">0</span>, $<span class="number">7</span>, $<span class="number">0</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="number">28</span>, $<span class="number">17</span>, label1</span><br><span class="line"><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">beq </span>$<span class="number">0</span>, $<span class="number">0</span>, label2</span><br><span class="line"><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="symbol">label1:</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="number">1</span>, $<span class="number">2</span>, label2</span><br><span class="line"><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">ori </span>$<span class="number">2</span>, $<span class="number">0</span>, <span class="number">12</span></span><br><span class="line"><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">jal </span>label3</span><br><span class="line"><span class="keyword">sw </span>$<span class="number">1</span>, <span class="number">0</span>($<span class="number">2</span>)</span><br><span class="line"><span class="keyword">beq </span>$<span class="number">0</span>, $<span class="number">0</span>, label2</span><br><span class="line"><span class="keyword">add </span>$<span class="number">1</span>, $<span class="number">1</span>, $<span class="number">2</span></span><br><span class="line"><span class="symbol">label3:</span></span><br><span class="line"><span class="keyword">add </span>$<span class="number">1</span>, $<span class="number">1</span>, $<span class="number">2</span></span><br><span class="line"><span class="keyword">add </span>$<span class="number">1</span>, $<span class="number">1</span>, $<span class="number">2</span></span><br><span class="line"><span class="keyword">add </span>$<span class="number">1</span>, $<span class="number">1</span>, $<span class="number">2</span></span><br><span class="line"><span class="keyword">sw </span>$<span class="number">31</span>, <span class="number">0</span>($<span class="number">2</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="number">1</span>, <span class="number">0</span>($<span class="number">2</span>)</span><br><span class="line"><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">jr </span>$<span class="number">1</span></span><br><span class="line"><span class="keyword">sw </span>$<span class="number">31</span>, <span class="number">0</span>($<span class="number">2</span>)</span><br><span class="line"><span class="symbol">label2:</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="number">0</span>, $<span class="number">0</span>, label2</span><br><span class="line"><span class="keyword">nop</span></span><br></pre></td></tr></table></figure></div>
+
+<p>然后使用魔改版<code>Mars</code>进行预期输出，与<code>Verilog</code>仿真输出比较，在不看时间并忽略对$0写入的输出的情况下，二者输出均为：</p>
+<div class="code-container" data-rel="Less"><figure class="iseeu highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@00003000:</span> $<span class="number">28</span> &lt;= <span class="number">00000000</span></span><br><span class="line"><span class="variable">@00003004</span>: $<span class="number">29</span> &lt;= <span class="number">00000000</span></span><br><span class="line"><span class="variable">@00003008</span>: $ <span class="number">1</span> &lt;= <span class="number">00001010</span></span><br><span class="line"><span class="variable">@0000300c</span>: $ <span class="number">2</span> &lt;= <span class="number">87230000</span></span><br><span class="line"><span class="variable">@00003010</span>: $ <span class="number">3</span> &lt;= <span class="number">00007856</span></span><br><span class="line"><span class="variable">@00003014</span>: $ <span class="number">4</span> &lt;= <span class="number">85</span>ff0000</span><br><span class="line"><span class="variable">@00003018</span>: $ <span class="number">5</span> &lt;= <span class="number">00000001</span></span><br><span class="line"><span class="variable">@0000301c</span>: $ <span class="number">6</span> &lt;= ffff0000</span><br><span class="line"><span class="variable">@00003020</span>: $ <span class="number">7</span> &lt;= <span class="number">0000</span>ffff</span><br><span class="line"><span class="variable">@00003024</span>: $ <span class="number">1</span> &lt;= <span class="number">87231010</span></span><br><span class="line"><span class="variable">@00003028</span>: $ <span class="number">9</span> &lt;= <span class="number">87238866</span></span><br><span class="line"><span class="variable">@0000302c</span>: $ <span class="number">8</span> &lt;= <span class="number">00001010</span></span><br><span class="line"><span class="variable">@0000304c</span>: $ <span class="number">2</span> &lt;= <span class="number">0000000</span>c</span><br><span class="line"><span class="variable">@0000305c</span>: $<span class="number">31</span> &lt;= <span class="number">00003064</span></span><br><span class="line"><span class="variable">@00003060</span>: *<span class="number">0000000</span>c &lt;= <span class="number">87231010</span></span><br><span class="line"><span class="variable">@0000306c</span>: $ <span class="number">1</span> &lt;= <span class="number">8723101</span>c</span><br><span class="line"><span class="variable">@00003070</span>: $ <span class="number">1</span> &lt;= <span class="number">87231028</span></span><br><span class="line"><span class="variable">@00003074</span>: $ <span class="number">1</span> &lt;= <span class="number">87231034</span></span><br><span class="line"><span class="variable">@00003078</span>: *<span class="number">0000000</span>c &lt;= <span class="number">00003064</span></span><br><span class="line"><span class="variable">@0000307c</span>: $ <span class="number">1</span> &lt;= <span class="number">00003064</span></span><br><span class="line"><span class="variable">@00003090</span>: *<span class="number">0000000</span>c &lt;= <span class="number">00003064</span></span><br><span class="line"><span class="variable">@00003068</span>: $ <span class="number">1</span> &lt;= <span class="number">00003070</span></span><br></pre></td></tr></table></figure></div>
+
+<p>由此可以初步判断，CPU的功能正常。</p>
+<h2 id="二、思考题"><a href="#二、思考题" class="headerlink" title="二、思考题"></a>二、思考题</h2><h3 id="1、"><a href="#1、" class="headerlink" title="1、"></a>1、</h3><p>提前分支判断会引入新的数据冒险，因为提起分支判断后分支跳转指令的t_use为0，如果对应寄存器在E、M、W的t_new大于0，则出现了必须阻塞的冒险，导致效率降低。指令序列的例子：</p>
+<div class="code-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add </span>$<span class="number">1</span>, $<span class="number">2</span>, $<span class="number">3</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="number">1</span>, $<span class="number">0</span>, label</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="2、"><a href="#2、" class="headerlink" title="2、"></a>2、</h3><p>由于延迟槽的存在，<code>jal</code>等需要将指令地址写入寄存器的指令在D级译码后才会得到跳转信号，此时F级中的指令地址为D_PC+4，如果将该地址存入寄存器，后续返回该地址时会回到已执行过的延迟槽中的指令，这是不对等，正确的写入地址应该为F_PC+4，也就是D_PC+8，所以要写回PC+8。</p>
+<h3 id="3、"><a href="#3、" class="headerlink" title="3、"></a>3、</h3><p>所有转发数据都来源于流水寄存器而不能是功能部件的原因是功能部件的输出有延迟，可能导致接收到的转发数据不稳定，造成错误，使用流水线寄存器的数据，是上一个周期已经计算好的，输出稳定，可以保证数据的正确性。</p>
+<h3 id="4、"><a href="#4、" class="headerlink" title="4、"></a>4、</h3><p>使用<code>GPR</code>内部转发是因为<code>GPR</code>既是D级的部件，又是W级的部件，基于这一特性，我们可以使用内部转发实现将W级数据转发到D级，避免D级使用错误数据。具体的实现方式为：</p>
+<div class="code-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">assign D_rsData_from_W = (W_RegWrite &amp;&amp; W_RegAddr != <span class="number">5</span><span class="string">&#x27;d0 &amp;&amp; D_rs == W_RegAddr &amp;&amp; W_t_new != 4&#x27;</span>hf &amp;&amp; D_t_rs_use != <span class="number">4</span><span class="string">&#x27;hf &amp;&amp; D_t_rs_use &gt;= W_t_new) ? 1&#x27;</span><span class="keyword">b1 </span>: <span class="number">1</span><span class="string">&#x27;b0;</span></span><br><span class="line"><span class="string">assign D_rtData_from_W = (W_RegWrite &amp;&amp; W_RegAddr != 5&#x27;</span>d0 &amp;&amp; D_rt == W_RegAddr &amp;&amp; W_t_new != <span class="number">4</span><span class="string">&#x27;hf &amp;&amp; D_t_rt_use != 4&#x27;</span>hf &amp;&amp; D_t_rt_use &gt;= W_t_new) ? <span class="number">1</span><span class="string">&#x27;b1 : 1&#x27;</span><span class="keyword">b0;</span></span><br></pre></td></tr></table></figure></div>
+
+<h3 id="5、"><a href="#5、" class="headerlink" title="5、"></a>5、</h3><p>转发时数据的需求者可能来自D级的<code>CMP</code>（<code>D_rsData</code>和<code>D_rtData</code>）、E级的<code>ALU</code>（<code>E_rsData</code>和<code>E_rtData</code>）、M级的<code>DM</code>（<code>M_rtData</code>），供给者可能来自E级和M级的PC+8、M级的<code>M_ALU_out</code>、W级的<code>W_RegData</code>。转发通路可以细分为15条：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">wire</span> D_rsData_from_E_PCplus8;</span><br><span class="line"><span class="keyword">wire</span> D_rtData_from_E_PCplus8;</span><br><span class="line"><span class="keyword">wire</span> D_rsData_from_M_PCplus8;</span><br><span class="line"><span class="keyword">wire</span> D_rtData_from_M_PCplus8;</span><br><span class="line"><span class="keyword">wire</span> E_rsData_from_M_PCplus8;</span><br><span class="line"><span class="keyword">wire</span> E_rtData_from_M_PCplus8;</span><br><span class="line"><span class="keyword">wire</span> D_rsData_from_M;</span><br><span class="line"><span class="keyword">wire</span> D_rtData_from_M;</span><br><span class="line"><span class="keyword">wire</span> D_rsData_from_W;</span><br><span class="line"><span class="keyword">wire</span> D_rtData_from_W;</span><br><span class="line"><span class="keyword">wire</span> E_rsData_from_M;</span><br><span class="line"><span class="keyword">wire</span> E_rtData_from_M;</span><br><span class="line"><span class="keyword">wire</span> E_rsData_from_W;</span><br><span class="line"><span class="keyword">wire</span> E_rtData_from_W;</span><br><span class="line"><span class="keyword">wire</span> M_rtData_from_W;</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="6、"><a href="#6、" class="headerlink" title="6、"></a>6、</h3><p>计算指令：首先修改<code>ALU</code>模块，使其能够满足新增指令的计算要求，然后修改<code>Controller</code>，处理指令的<code>OpCode</code>和<code>Funct</code>，在新增指令的<code>case</code>块中按要求设置相应的控制信号，并输出对应的t_rs、t_rt和t，其他数据通路基本不需要修改。</p>
+<p>跳转指令：对于条件跳转指令，在D级中加入相关条件的判断，然后在<code>Controller</code>中新增并修改相关控制信号和时间输出，两个信号结合在D级中输给<code>D_jump</code>信号，数据通路基本不变。对于无条件跳转指令，首先修改<code>Controller</code>中相关控制信号和时间输出，对于需要链接的，还要将<code>RegWrite</code>输出置为1，并新增对应的控制信号在D级中选择链接的寄存器地址。</p>
+<p>访存指令：首先修改<code>Controller</code>，让其能够处理新增指令的控制信号和时间输出，对于访问指令，利用控制信号在M级中处理得到需要访问的地址，而对于存储指令，则需要利用控制信号在M级中处理存储的地址和数据。</p>
+<h3 id="7、"><a href="#7、" class="headerlink" title="7、"></a>7、</h3><p>我的译码方式为分布式译码，译码器架构为指令驱动型，利用<code>case</code>语句对不同指令的控制信号实现赋值。这种架构的优点是在新增指令时不需要将控制信号流水到每一级，只需要在用到的级译码使用，添加新指令方便，但缺点是新增指令时需要修改的地方较多，整体代码量会随指令数量增多而显著增大，同时也增加了流水线的逻辑复杂度。</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> P5_CPU设计文档</li>
+        <li><strong>Author:</strong> Zeng Yue</li>
+        <li><strong>Created at
+                :</strong> 2026-02-06 17:53:45</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2026-02-06 18:00:09
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://stratus-z.github.io/2026/02/06/P5-CPU设计文档/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a>.
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/CO/">#CO</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2026/02/06/P6-CPU%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">P6_CPU设计文档</span>
+						<span class="post-nav-item">Prev posts</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2026/02/06/P4-CPU%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">P4_CPU设计文档</span>
+						<span class="post-nav-item">Next posts</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        Comments
+    </div>
+    
+
+        
+            
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '/js/libs/waline.mjs';
+
+      function loadWaline() {
+        init({
+          el: '#waline',
+          serverURL: 'https://stratus-blog.vercel.app/',
+          dark: 'body[class~="dark-mode"]',
+          reaction: true,
+          requiredMeta: ['nick', 'mail'],
+          emoji: [],
+                    lang: 'zh-CN',
+        });
+      }
+
+      if (typeof swup !== 'undefined') {
+        loadWaline();
+      } else {
+        window.addEventListener('DOMContentLoaded', loadWaline);
+      }
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">P5_CPU设计文档</div>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81CPU%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3"><span class="nav-text">一、CPU设计文档</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E4%B8%80%EF%BC%89%E8%AE%BE%E8%AE%A1%E8%8D%89%E7%A8%BF"><span class="nav-text">（一）设计草稿</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E4%BA%8C%EF%BC%89%E6%B5%8B%E8%AF%95%E6%96%B9%E6%A1%88"><span class="nav-text">（二）测试方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%80%9D%E8%80%83%E9%A2%98"><span class="nav-text">二、思考题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81"><span class="nav-text">1、</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81"><span class="nav-text">2、</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81"><span class="nav-text">3、</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81"><span class="nav-text">4、</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81"><span class="nav-text">5、</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6%E3%80%81"><span class="nav-text">6、</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7%E3%80%81"><span class="nav-text">7、</span></a></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2025</span>
+              -
+            
+            2026&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">Zeng Yue</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        8 posts in total
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">VISITOR COUNT</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">TOTAL PAGE VIEWS</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                Blog up for <span class="odometer" id="runtime_days" ></span> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Search..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

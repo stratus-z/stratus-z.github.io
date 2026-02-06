@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="Zeng Yue">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="https://stratus-z.github.io/2026/02/06/p4-cpu设计文档/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="P4_CPU设计文档">
+<meta property="og:url" content="https://stratus-z.github.io/2026/02/06/P4-CPU%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://stratus-z.github.io/images/redefine-og.webp">
+<meta property="article:published_time" content="2026-02-06T09:50:41.000Z">
+<meta property="article:modified_time" content="2026-02-06T09:53:04.421Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="CO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://stratus-z.github.io/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/favicon.svg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.svg">
+    <meta name="theme-color" content="#A31F34">
+    <link rel="shortcut icon" href="/images/favicon.svg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            P4_CPU设计文档 | Stratus
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"stratus-z.github.io","root":"/","language":"en","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":"Hexo Theme Redefine, Redefine Your Hexo Journey."},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/wallhaven-rdoovj_1920x1080.png","dark":"/images/wallhaven-1pwmpg_1920x1080.png"},"title":"Stratus Blog","subtitle":{"text":["欢迎来到层云遮蔽下的空间。"],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"style":"default","links":{"github":"https://github.com/stratus-z","instagram":null,"zhihu":null,"twitter":null,"email":null},"qrs":{"weixin":"/images/weixin.png","qq":"/images/QQ.png"}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"11.4.1"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Tags":{"icon":"fa-solid fa-tags","path":"/tags/"},"Archives":{"path":"/archives/","icon":"fa-regular fa-archive"},"Categories":{"path":"/categories/","icon":"fa-regular fa-folder"},"About":{"icon":"fa-regular fa-user","submenus":{"Me":"/about/","Github":"https://github.com/stratus-z"}},"Links":{"icon":"fa-regular fa-link","path":"/links/"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":{"Tags":{"path":"/tags","icon":"fa-regular fa-tags"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2025/8/6 15:14:15"};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                Stratus
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    HOME
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/tags/"
+                                        >
+                                    <i class="fa-solid fa-tags fa-fw"></i>
+                                    TAGS
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives/"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    ARCHIVES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    CATEGORIES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="has-dropdown"
+                                   href="#"
+                                        onClick=&#34;return false;&#34;>
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    ABOUT
+                                    <i class="fa-solid fa-chevron-down fa-fw"></i>
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                                    <ul class="sub-menu">
+                                        
+                                            <li>
+                                                <a href="/about/">
+                                                    ME
+                                                </a>
+                                            </li>
+                                        
+                                            <li>
+                                                <a target="_blank" rel="noopener" href="https://github.com/stratus-z">
+                                                    GITHUB
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/links/"
+                                        >
+                                    <i class="fa-regular fa-link fa-fw"></i>
+                                    LINKS
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                HOME
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/tags/"
+                        >
+                            <span>
+                                TAGS
+                            </span>
+                            
+                                <i class="fa-solid fa-tags fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives/"
+                        >
+                            <span>
+                                ARCHIVES
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                CATEGORIES
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item-sub text-base my-1.5 flex flex-col w-full">
+                        
+                        <div class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary cursor-pointer text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                             navbar-data-toggle="submenu-About"
+                        >
+                            <span>
+                                ABOUT
+                            </span>
+                            
+                                <i class="fa-solid fa-chevron-right fa-sm fa-fw transition-all"></i>
+                            
+                        </div>
+                        
+
+                        
+                            <div class="flex-col items-start px-2 py-2 hidden" data-target="submenu-About">
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           href="/about/">ME</a>
+                                    </div>
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           target="_blank" rel="noopener" href="https://github.com/stratus-z">GITHUB</a>
+                                    </div>
+                                
+                            </div>
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/links/"
+                        >
+                            <span>
+                                LINKS
+                            </span>
+                            
+                                <i class="fa-regular fa-link fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+                
+                    
+                    
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">4</div>
+        <div class="label text-third-text-color text-sm">Tags</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">1</div>
+        <div class="label text-third-text-color text-sm">Categories</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">8</div>
+        <div class="label text-third-text-color text-sm">Posts</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">P4_CPU设计文档</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">Zeng Yue</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv2</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2026-02-06 17:50:41</span>
+        <span class="mobile">2026-02-06 17:50:41</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2026-02-06 17:53:04</span>
+            <span class="mobile">2026-02-06 17:53:04</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E4%B8%93%E4%B8%9A%E8%AF%BE/">专业课</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/CO/">CO</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h2 id="一、CPU设计文档"><a href="#一、CPU设计文档" class="headerlink" title="一、CPU设计文档"></a>一、CPU设计文档</h2><h3 id="（一）设计草稿"><a href="#（一）设计草稿" class="headerlink" title="（一）设计草稿"></a>（一）设计草稿</h3><p>本次CPU搭建需要实现的指令有<code>add</code>, <code>sub</code>, <code>ori</code>, <code>lw</code>, <code>sw</code>, <code>beq</code>, <code>lui</code>, <code>jal</code>, <code>jr</code>, <code>nop</code>，而CPU的构成模块有<code>IFU</code>, <code>GRF</code>, <code>ALU</code>, <code>DM</code>, <code>EXT</code>, <code>Controller</code>, <code>NPC</code>, <code>Splitter</code>，其中<code>EXT</code>和<code>Splitter</code>可以有<code>Logisim</code>自带的元件实现，而其他的模块则需要我们自己搭建。</p>
+<p>在要实现的指令中，I型指令有 <code>ori</code>, <code>lw</code>, <code>sw</code>, <code>beq</code>, <code>lui</code>：</p>
+<table>
+<thead>
+<tr>
+<th align="center">OpCode</th>
+<th align="center">rs</th>
+<th align="center">rt</th>
+<th align="center">imm16</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">6</td>
+<td align="center">5</td>
+<td align="center">5</td>
+<td align="center">16</td>
+</tr>
+</tbody></table>
+<p>R型指令有<code>add</code>, <code>sub</code>, <code>nop</code>, <code>jr</code>：</p>
+<table>
+<thead>
+<tr>
+<th align="center">OpCode</th>
+<th align="center">rs</th>
+<th align="center">rt</th>
+<th align="center">rd</th>
+<th align="center">shamt</th>
+<th align="center">Funct</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">6</td>
+<td align="center">5</td>
+<td align="center">5</td>
+<td align="center">5</td>
+<td align="center">5</td>
+<td align="center">6</td>
+</tr>
+</tbody></table>
+<p>J型指令有<code>jal</code>：</p>
+<table>
+<thead>
+<tr>
+<th align="center">OpCode</th>
+<th align="center">imm26</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">6</td>
+<td align="center">26</td>
+</tr>
+</tbody></table>
+<h4 id="1、IFU"><a href="#1、IFU" class="headerlink" title="1、IFU"></a>1、<code>IFU</code></h4><p>按照教程要求，<code>IFU</code>内部包括<code>PC</code>和<code>IM</code>的功能，其中<code>PC</code>用寄存器实现，并需要具有同步复位至<code>0x00003000</code>的功能，<code>IM</code>则要求容量为<code>4096 × 32bit</code>。</p>
+<p>对于<code>IM</code>，它保存的内容时待执行代码的二进制码，因此用<code>ROM</code>来实现，由于<code>PC</code>的起始地址为<code>0x00003000</code>，且相邻两条地址相差为4，因此地址<code>PC</code>与<code>ROM</code>中指令地址的对应关系与<code>P3</code>相同。</p>
+<p>基于<code>P3</code>的<code>Logisim</code>单周期CPU，结合<code>Verilog</code>语言，我将<code>IFU</code>模块翻译并简化，加入课程要求的系统导入<code>code.txt</code>功能，得到对应的核心代码描述为：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">reg</span> [<span class="number">31</span>:<span class="number">0</span>] ROM [<span class="number">0</span>:<span class="number">4095</span>];</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">31</span>:<span class="number">0</span>] regPC;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] InstrAddr;</span><br><span class="line"></span><br><span class="line"><span class="keyword">initial</span> <span class="keyword">begin</span></span><br><span class="line">    <span class="built_in">$readmemh</span>(<span class="string">&quot;code.txt&quot;</span>, ROM, <span class="number">0</span>, <span class="number">4095</span>);</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk) <span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">if</span> (reset) <span class="keyword">begin</span></span><br><span class="line">		regPC &lt;= <span class="number">32&#x27;h3000</span>;</span><br><span class="line">	<span class="keyword">end</span> <span class="keyword">else</span> <span class="keyword">begin</span></span><br><span class="line">		regPC &lt;= NPC;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> InstrAddr = PC - <span class="number">32&#x27;h3000</span>;</span><br><span class="line"><span class="keyword">assign</span> Instr = ROM[InstrAddr[<span class="number">13</span>:<span class="number">2</span>]];</span><br><span class="line"><span class="keyword">assign</span> PC = regPC;</span><br></pre></td></tr></table></figure></div>
+
+<p>对应模块的端口的说明为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号名</th>
+<th align="center">方向</th>
+<th align="center">位宽</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">NPC</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center"><code>NPC</code>模块输出的下一条指令的地址</td>
+</tr>
+<tr>
+<td align="center">clk</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">时钟信号</td>
+</tr>
+<tr>
+<td align="center">reset</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">异步复位信号</td>
+</tr>
+<tr>
+<td align="center">Instr</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center"><code>IM</code>取出的指令</td>
+</tr>
+<tr>
+<td align="center">PC</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">当前指令地址</td>
+</tr>
+</tbody></table>
+<h4 id="2、GRF"><a href="#2、GRF" class="headerlink" title="2、GRF"></a>2、<code>GRF</code></h4><p><code>GRF</code>是通用寄存器组，这次在<code>P3</code>要求的基础上将异步复位调整为了同步复位，这样也方便了<code>Verilog</code>的书写，利用<code>Verilog</code>中的寄存器数组便可以轻松实现：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">reg</span> [<span class="number">31</span>:<span class="number">0</span>] regs [<span class="number">0</span>:<span class="number">31</span>];</span><br><span class="line"><span class="keyword">integer</span> i;</span><br><span class="line"></span><br><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk) <span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">if</span> (reset) <span class="keyword">begin</span></span><br><span class="line">		<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">32</span>; i = i + <span class="number">1</span>) <span class="keyword">begin</span></span><br><span class="line">			regs[i] &lt;= <span class="number">32&#x27;h0</span>;</span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">	<span class="keyword">end</span> <span class="keyword">else</span> <span class="keyword">begin</span></span><br><span class="line">		<span class="keyword">if</span> (WE) <span class="keyword">begin</span></span><br><span class="line">			<span class="keyword">if</span> (A3 != <span class="number">5&#x27;b00000</span>) <span class="keyword">begin</span></span><br><span class="line">				regs[A3] &lt;= WD;</span><br><span class="line">			<span class="keyword">end</span></span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> RD1 = regs[A1];</span><br><span class="line"><span class="keyword">assign</span> RD2 = regs[A2];</span><br></pre></td></tr></table></figure></div>
+
+<p>对应模块的端口的说明为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号名</th>
+<th align="center">方向</th>
+<th align="center">位宽</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">PC</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">用于输出</td>
+</tr>
+<tr>
+<td align="center">A1</td>
+<td align="center">I</td>
+<td align="center">5</td>
+<td align="center">读寄存器1的地址<code>rs</code></td>
+</tr>
+<tr>
+<td align="center">A2</td>
+<td align="center">I</td>
+<td align="center">5</td>
+<td align="center">读寄存器2的地址<code>rt</code></td>
+</tr>
+<tr>
+<td align="center">Waddr</td>
+<td align="center">I</td>
+<td align="center">5</td>
+<td align="center">写入寄存器的地址</td>
+</tr>
+<tr>
+<td align="center">WData</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">写入寄存器的数据</td>
+</tr>
+<tr>
+<td align="center">clk</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">时钟信号</td>
+</tr>
+<tr>
+<td align="center">reset</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">异步复位信号</td>
+</tr>
+<tr>
+<td align="center">WE</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">写入使能信号</td>
+</tr>
+<tr>
+<td align="center">RD1</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">读寄存器<code>rs</code>的数据</td>
+</tr>
+<tr>
+<td align="center">RD2</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">读寄存器<code>rt</code>的数据</td>
+</tr>
+</tbody></table>
+<h4 id="3、ALU"><a href="#3、ALU" class="headerlink" title="3、ALU"></a>3、<code>ALU</code></h4><p><code>ALU</code>作为算术逻辑单元需要实现加、减、或运算和比较大小的功能，这些功能可以通过多路选择器来实现选择输出，其中比较大小功能是在输入的两个数相等时输出1，因此为其单独设计一个输出口<code>beq</code>。用于选择运算的<code>ALU_op</code>为两位，000时选择加法运算，001时选择减法运算，010时选择或运算，其他时上方<code>out</code>输出为<code>32&#39;h00000000</code>，表示不需要用到上方输出，同时便于后续扩展。按照此逻辑，原来的<code>ALU</code>模块可以翻译为：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">parameter</span> ADD = <span class="number">3&#x27;b000</span>,</span><br><span class="line">		  SUB = <span class="number">3&#x27;b001</span>,</span><br><span class="line">		  OR = <span class="number">3&#x27;b010</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] Add;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] Sub;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] Or;</span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> Add = in1 + in2;</span><br><span class="line"><span class="keyword">assign</span> Sub = in1 - in2;</span><br><span class="line"><span class="keyword">assign</span> Or = in1 | in2;</span><br><span class="line"><span class="keyword">assign</span> out = (ALU_op == ADD) ? Add :</span><br><span class="line">			 (ALU_op == SUB) ? Sub :</span><br><span class="line">			 (ALU_op == OR) ? Or:</span><br><span class="line">			 <span class="number">32&#x27;h00000000</span>;</span><br><span class="line"><span class="keyword">assign</span> equal = (in1 == in2) ? <span class="number">1</span> : <span class="number">0</span>;</span><br></pre></td></tr></table></figure></div>
+
+<p>对应端口说明为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号名</th>
+<th align="center">方向</th>
+<th align="center">位宽</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">in1</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">输入待操作数1</td>
+</tr>
+<tr>
+<td align="center">in2</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">输入待操作数2</td>
+</tr>
+<tr>
+<td align="center">ALU_op</td>
+<td align="center">I</td>
+<td align="center">3</td>
+<td align="center"><code>ALU</code>控制信号</td>
+</tr>
+<tr>
+<td align="center">out</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">运算结果</td>
+</tr>
+<tr>
+<td align="center">equal</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center">两个待操作数是否相等</td>
+</tr>
+</tbody></table>
+<h4 id="4、NPC"><a href="#4、NPC" class="headerlink" title="4、NPC"></a>4、<code>NPC</code></h4><p><code>NPC</code>模块是根据当前地址和操作，处理得到下一条指令的地址。根据相邻两条地址相差4，如果指令中没有转跳，下一条指令地址即为当前地址加4，否则，如果为<code>beq</code>转跳，还要加上指令跳转的相对偏移量<code>offset</code>，如果为绝对跳转指令，输出<code>NPC</code>就是绝对跳转指令的目标地址，根据此逻辑得到代码：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] sign_offset;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] adder0;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] adder1;</span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> sign_offset = &#123;&#123;<span class="number">16</span>&#123;offset[<span class="number">15</span>]&#125;&#125;, offset&#125;;	<span class="comment">//符号扩展</span></span><br><span class="line"><span class="keyword">assign</span> adder0 = PC + <span class="number">32&#x27;h00000004</span>;</span><br><span class="line"><span class="keyword">assign</span> adder1 = adder0 + sign_offset;</span><br><span class="line"><span class="keyword">assign</span> NPC = (j == <span class="number">1</span>) ? dst :</span><br><span class="line">    (rj == <span class="number">1</span>) ? adder1 :</span><br><span class="line">			 adder0;</span><br></pre></td></tr></table></figure></div>
+
+<p>端口说明为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号名</th>
+<th align="center">方向</th>
+<th align="center">位宽</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">PC</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">当前指令地址</td>
+</tr>
+<tr>
+<td align="center">offset</td>
+<td align="center">I</td>
+<td align="center">16</td>
+<td align="center">跳转的相对偏移量</td>
+</tr>
+<tr>
+<td align="center">dst</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">绝对跳转的目标地址</td>
+</tr>
+<tr>
+<td align="center">rj</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">1表示要相对跳转，0表示不要</td>
+</tr>
+<tr>
+<td align="center">j</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">1表示要绝对跳转，0表示不要</td>
+</tr>
+<tr>
+<td align="center">NPC</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">下一条指令地址</td>
+</tr>
+</tbody></table>
+<h4 id="5、DM"><a href="#5、DM" class="headerlink" title="5、DM"></a>5、<code>DM</code></h4><p><code>DM</code>模块与<code>IM</code>部分类似，依旧使用寄存器数组来实现。与<code>Logisim</code>中不同的是，<code>Verilog</code>中只需要控制信号来控制是否写入即可，输出可以一直保持，同时将复位调整为同步复位便可以完成。对应核心部分为：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">reg</span> [<span class="number">31</span>:<span class="number">0</span>] RAM [<span class="number">0</span>:<span class="number">4095</span>];</span><br><span class="line"><span class="keyword">integer</span> i;</span><br><span class="line"></span><br><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk) <span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">if</span> (reset) <span class="keyword">begin</span></span><br><span class="line">		<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">4096</span>; i = i + <span class="number">1</span>) <span class="keyword">begin</span></span><br><span class="line">			RAM[i] &lt;= <span class="number">32&#x27;h0</span>;</span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">	<span class="keyword">end</span> <span class="keyword">else</span> <span class="keyword">begin</span></span><br><span class="line">		<span class="keyword">if</span> (WR) <span class="keyword">begin</span></span><br><span class="line">			RAM[Addr[<span class="number">13</span>:<span class="number">2</span>]] &lt;= WD;</span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> RD = RAM[Addr[<span class="number">13</span>:<span class="number">2</span>]];</span><br></pre></td></tr></table></figure></div>
+
+<p>对应端口说明为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号名</th>
+<th align="center">方向</th>
+<th align="center">位宽</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">PC</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">用于输出</td>
+</tr>
+<tr>
+<td align="center">Addr</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">写入或读取的地址</td>
+</tr>
+<tr>
+<td align="center">WD</td>
+<td align="center">I</td>
+<td align="center">32</td>
+<td align="center">写入的数据</td>
+</tr>
+<tr>
+<td align="center">WR</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">0表示读，1表示写</td>
+</tr>
+<tr>
+<td align="center">clk</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">时钟信号</td>
+</tr>
+<tr>
+<td align="center">reset</td>
+<td align="center">I</td>
+<td align="center">1</td>
+<td align="center">异步复位信号</td>
+</tr>
+<tr>
+<td align="center">RD</td>
+<td align="center">O</td>
+<td align="center">32</td>
+<td align="center">读取的数据</td>
+</tr>
+</tbody></table>
+<h4 id="6、Controller"><a href="#6、Controller" class="headerlink" title="6、Controller"></a>6、<code>Controller</code></h4><p><code>Controller</code>模块用于处理当前的指令类型，并输出控制信息，协调其他模块一起实现指令要求的功能。根据指令集和相关指令的功能，得到一张输入输出关系对应表：</p>
+<table>
+<thead>
+<tr>
+<th align="center">指令</th>
+<th align="center">OpCode</th>
+<th align="center">RegDst</th>
+<th align="center">ALUSrc</th>
+<th align="center">MemtoReg</th>
+<th align="center">RegWrite</th>
+<th align="center">MemWrite</th>
+<th align="center">beq</th>
+<th align="center">ExtOp</th>
+<th align="center">ALU_op</th>
+<th align="center">lui</th>
+<th align="center">jal</th>
+<th align="center">jr</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">add</td>
+<td align="center">000000</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">000</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">sub</td>
+<td align="center">000000</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">001</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">ori</td>
+<td align="center">001101</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">010</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">lw</td>
+<td align="center">100011</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">000</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">sw</td>
+<td align="center">101011</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">000</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">beq</td>
+<td align="center">000100</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">001</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">lui</td>
+<td align="center">001111</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">000</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">jal</td>
+<td align="center">000011</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">000</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">jr</td>
+<td align="center">000000</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">000</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+</tbody></table>
+<p>其中，<code>add</code>（100000 ）、<code>sub</code>（100010）和<code>jr</code>（001000）还需要根据<code>Funct</code>来区分。基于原有的<code>Logisim</code>模块和<code>Verilog</code>语言的特点，得到实现代码：</p>
+<p>其端口说明为：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号名</th>
+<th align="center">方向</th>
+<th align="center">位宽</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Funct</td>
+<td align="center">I</td>
+<td align="center">6</td>
+<td align="center">输入Instr[5:0]</td>
+</tr>
+<tr>
+<td align="center">OpCode</td>
+<td align="center">I</td>
+<td align="center">6</td>
+<td align="center">输入Instr[31:26]</td>
+</tr>
+<tr>
+<td align="center">RegDst</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center"><code>GRF</code>写选择信号，0表示<code>rt</code>，1表示<code>rd</code></td>
+</tr>
+<tr>
+<td align="center">ALUSrc</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center"><code>ALU</code>输入信号选择，0表示<code>in2</code>为<code>RD2</code>，1表示<code>in2</code>为扩展后的<code>imm16</code></td>
+</tr>
+<tr>
+<td align="center">MemtoReg</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center"><code>GRF</code>输入数据选择信号，0表示来自<code>ALU</code>，1表示来自<code>DM</code></td>
+</tr>
+<tr>
+<td align="center">RegWrite</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center"><code>GRF</code>写使能信号</td>
+</tr>
+<tr>
+<td align="center">MemWrite</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center"><code>DM</code>读写使能信号</td>
+</tr>
+<tr>
+<td align="center">beq</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center">1表示当前指令为<code>beq</code></td>
+</tr>
+<tr>
+<td align="center">ExtOp</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center">扩展选择信号，0为零扩展，1为符号扩展</td>
+</tr>
+<tr>
+<td align="center">ALU_op</td>
+<td align="center">O</td>
+<td align="center">3</td>
+<td align="center">ALU的操作码</td>
+</tr>
+<tr>
+<td align="center">lui</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center">1表示当前指令为<code>lui</code>，<code>GRF</code>输入数据选择为<code>imm16</code>加载至高位</td>
+</tr>
+<tr>
+<td align="center">jal</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center">1表示当前指令为<code>jal</code>，<code>GRF</code>输入数据选择为PC+4，输入地址为31，<code>NPC</code>输出为<code>dst</code>，来自<code>imm26</code>处理后</td>
+</tr>
+<tr>
+<td align="center">jr</td>
+<td align="center">O</td>
+<td align="center">1</td>
+<td align="center">1表示当前指令为<code>jr</code>，<code>NPC</code>输出为<code>dst</code>，来自<code>GRF[rs]</code></td>
+</tr>
+</tbody></table>
+<h3 id="（二）测试方案"><a href="#（二）测试方案" class="headerlink" title="（二）测试方案"></a>（二）测试方案</h3><p>参照实验教程，利用<code>Mars</code>实现程序的验证，通过<code>ISE</code>仿真输出和<code>Mars</code>运行流程，匹配仿真输出和<code>Mars</code>行为来判断当前功能是否正确。根据教程提供的<code>p4_testcode.txt</code>，将其翻译为对应的MIPS代码：</p>
+<div class="code-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">.text</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">28</span>, $<span class="number">0</span>, <span class="number">0</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">29</span>, $<span class="number">0</span>, <span class="number">0</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">1</span>, $<span class="number">0</span>, <span class="number">13398</span></span><br><span class="line"><span class="keyword">add </span>$<span class="number">1</span>, $<span class="number">1</span>, $<span class="number">1</span></span><br><span class="line"><span class="keyword">lw </span>$<span class="number">1</span>, <span class="number">4</span>($<span class="number">0</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="number">1</span>, <span class="number">4</span>($<span class="number">0</span>)</span><br><span class="line"><span class="keyword">lui </span>$<span class="number">2</span>, <span class="number">30840</span></span><br><span class="line"><span class="keyword">sub </span>$<span class="number">3</span>, $<span class="number">2</span>, $<span class="number">1</span></span><br><span class="line"><span class="keyword">lui </span>$<span class="number">5</span>, <span class="number">4660</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">4</span>, $<span class="number">0</span>, <span class="number">5</span></span><br><span class="line"><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">sw </span>$<span class="number">5</span>, -<span class="number">1</span>($<span class="number">4</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="number">3</span>, -<span class="number">1</span>($<span class="number">4</span>)</span><br><span class="line"><span class="keyword">beq </span>$<span class="number">3</span>, $<span class="number">5</span>, label1</span><br><span class="line"><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">beq </span>$<span class="number">0</span>, $<span class="number">0</span>, label2</span><br><span class="line"><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="symbol">label1:</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">7</span>, $<span class="number">3</span>, <span class="number">1028</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="number">7</span>, $<span class="number">3</span>, label2</span><br><span class="line"><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">lui </span>$<span class="number">8</span>, <span class="number">30583</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">8</span>, $<span class="number">8</span>, <span class="number">65535</span></span><br><span class="line"><span class="keyword">sub </span>$<span class="number">0</span>, $<span class="number">0</span>, $<span class="number">8</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">0</span>, $<span class="number">0</span>, <span class="number">4352</span></span><br><span class="line"><span class="keyword">add </span>$<span class="number">10</span>, $<span class="number">7</span>, $<span class="number">6</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">8</span>, $<span class="number">0</span>, <span class="number">0</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">9</span>, $<span class="number">0</span>, <span class="number">1</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">10</span>, $<span class="number">0</span>, <span class="number">1</span></span><br><span class="line"><span class="symbol">label3:</span></span><br><span class="line"><span class="keyword">add </span>$<span class="number">8</span>, $<span class="number">8</span>, $<span class="number">10</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="number">8</span>, $<span class="number">9</span>, label3</span><br><span class="line"><span class="keyword">jal </span>label4</span><br><span class="line"><span class="keyword">nop</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">add </span>$<span class="number">10</span>, $<span class="number">10</span>, $<span class="number">10</span></span><br><span class="line"><span class="symbol">label2:</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="number">0</span>, $<span class="number">0</span>, label2</span><br><span class="line"><span class="symbol">label4:</span></span><br><span class="line"><span class="keyword">add </span>$<span class="number">10</span>, $<span class="number">10</span>, $<span class="number">10</span></span><br><span class="line"><span class="keyword">jr </span>$<span class="number">31</span></span><br><span class="line"><span class="keyword">nop</span></span><br></pre></td></tr></table></figure></div>
+
+<p>经过对比，<code>Verilog</code>仿真输出与<code>Mars</code>的行为相符，故可知CPU功能大体正确。</p>
+<h2 id="二、思考题"><a href="#二、思考题" class="headerlink" title="二、思考题"></a>二、思考题</h2><h3 id="1、"><a href="#1、" class="headerlink" title="1、"></a>1、</h3><p>这个<code>addr</code>信号来自<code>ALU</code>的输出<code>ALU_out</code>。地址信号 <code>addr</code> 位数是 <code>[11:2]</code> 而不是 <code>[9:0]</code>是因为<code>DM</code>容量为<code>12KiB（3072 × 32bit）</code>，而且<code>DM</code>中是按字索引，<code>ALU_out</code>需要除以4即右移2位才可得到<code>DM</code>中的地址索引，故直接省去低两位来代替右移，即对应位数为<code>[11:2]</code>。</p>
+<h3 id="2、"><a href="#2、" class="headerlink" title="2、"></a>2、</h3><p>第一种记录指令对应的控制信号如何取值的实现：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">RegDst = <span class="number">1&#x27;b0</span>;</span><br><span class="line">ALUSrc = <span class="number">1&#x27;b0</span>;</span><br><span class="line">MemtoReg = <span class="number">1&#x27;b0</span>;</span><br><span class="line">RegWrite = <span class="number">1&#x27;b0</span>;</span><br><span class="line">MemWrite = <span class="number">1&#x27;b0</span>;</span><br><span class="line">beq = <span class="number">1&#x27;b0</span>;</span><br><span class="line">ExtOp = <span class="number">1&#x27;b0</span>;</span><br><span class="line">ALU_op = <span class="number">3&#x27;b000</span>;</span><br><span class="line">lui = <span class="number">1&#x27;b0</span>;</span><br><span class="line">jal = <span class="number">1&#x27;b0</span>;</span><br><span class="line">jr = <span class="number">1&#x27;b0</span>;</span><br><span class="line"><span class="keyword">case</span>(OpCode)</span><br><span class="line">	FUNCT: <span class="keyword">begin</span></span><br><span class="line">		<span class="keyword">case</span>(Funct)</span><br><span class="line">			ADD: <span class="keyword">begin</span></span><br><span class="line">				RegDst = <span class="number">1&#x27;b1</span>;</span><br><span class="line">				RegWrite = <span class="number">1&#x27;b1</span>;</span><br><span class="line">			<span class="keyword">end</span></span><br><span class="line">			SUB: <span class="keyword">begin</span></span><br><span class="line">				RegDst = <span class="number">1&#x27;b1</span>;</span><br><span class="line">				RegWrite = <span class="number">1&#x27;b1</span>;</span><br><span class="line">				ALU_op = <span class="number">3&#x27;b001</span>;</span><br><span class="line">			<span class="keyword">end</span></span><br><span class="line">			JR: <span class="keyword">begin</span></span><br><span class="line">				jr = <span class="number">1&#x27;b1</span>;</span><br><span class="line">			<span class="keyword">end</span></span><br><span class="line">		<span class="keyword">endcase</span></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	ORI: <span class="keyword">begin</span></span><br><span class="line">		ALUSrc = <span class="number">1&#x27;b1</span>;</span><br><span class="line">		RegWrite = <span class="number">1&#x27;b1</span>;</span><br><span class="line">		ALU_op = <span class="number">3&#x27;b010</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	LW: <span class="keyword">begin</span></span><br><span class="line">		ALUSrc = <span class="number">1&#x27;b1</span>;</span><br><span class="line">		MemtoReg = <span class="number">1&#x27;b1</span>;</span><br><span class="line">		RegWrite = <span class="number">1&#x27;b1</span>;</span><br><span class="line">		ExtOp = <span class="number">1&#x27;b1</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	SW: <span class="keyword">begin</span></span><br><span class="line">		ALUSrc = <span class="number">1&#x27;b1</span>;</span><br><span class="line">		MemWrite = <span class="number">1&#x27;b1</span>;</span><br><span class="line">		ExtOp = <span class="number">1&#x27;b1</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	BEQ: <span class="keyword">begin</span></span><br><span class="line">		beq = <span class="number">1&#x27;b1</span>;</span><br><span class="line">		ALU_op = <span class="number">3&#x27;b001</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	LUI: <span class="keyword">begin</span></span><br><span class="line">		RegWrite = <span class="number">1&#x27;b1</span>;</span><br><span class="line">		lui = <span class="number">1&#x27;b1</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	JAL: <span class="keyword">begin</span></span><br><span class="line">		RegWrite = <span class="number">1&#x27;b1</span>;</span><br><span class="line">		jal = <span class="number">1&#x27;b1</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">endcase</span></span><br></pre></td></tr></table></figure></div>
+
+<p>第二种记录控制信号每种取值所对应的指令的实现：</p>
+<div class="code-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">RegDst = <span class="number">1&#x27;b0</span>;</span><br><span class="line">ALUSrc = <span class="number">1&#x27;b0</span>;</span><br><span class="line">MemtoReg = <span class="number">1&#x27;b0</span>;</span><br><span class="line">RegWrite = <span class="number">1&#x27;b0</span>;</span><br><span class="line">MemWrite = <span class="number">1&#x27;b0</span>;</span><br><span class="line">beq = <span class="number">1&#x27;b0</span>;</span><br><span class="line">ExtOp = <span class="number">1&#x27;b0</span>;</span><br><span class="line">ALU_op = <span class="number">3&#x27;b000</span>;</span><br><span class="line">lui = <span class="number">1&#x27;b0</span>;</span><br><span class="line">jal = <span class="number">1&#x27;b0</span>;</span><br><span class="line">jr = <span class="number">1&#x27;b0</span>;</span><br><span class="line">Add = <span class="number">0</span>;</span><br><span class="line">Sub = <span class="number">0</span>;</span><br><span class="line">Ori = <span class="number">0</span>;</span><br><span class="line">Lw = <span class="number">0</span>;</span><br><span class="line">Sw = <span class="number">0</span>;</span><br><span class="line">Beq = <span class="number">0</span>;</span><br><span class="line">Lui = <span class="number">0</span>;</span><br><span class="line">Jal = <span class="number">0</span>;</span><br><span class="line">Jr = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">case</span>(OpCode)</span><br><span class="line">	FUNCT: <span class="keyword">begin</span></span><br><span class="line">		<span class="keyword">case</span>(Funct)</span><br><span class="line">			ADD: <span class="keyword">begin</span></span><br><span class="line">				Add = <span class="number">1</span>;</span><br><span class="line">			<span class="keyword">end</span></span><br><span class="line">			SUB: <span class="keyword">begin</span></span><br><span class="line">				Sub = <span class="number">1</span>;</span><br><span class="line">			<span class="keyword">end</span></span><br><span class="line">			JR: <span class="keyword">begin</span></span><br><span class="line">				Jr = <span class="number">1</span>;</span><br><span class="line">			<span class="keyword">end</span></span><br><span class="line">		<span class="keyword">endcase</span></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	ORI: <span class="keyword">begin</span></span><br><span class="line">		Ori = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	LW: <span class="keyword">begin</span></span><br><span class="line">		Lw = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	SW: <span class="keyword">begin</span></span><br><span class="line">		Sw = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	BEQ: <span class="keyword">begin</span></span><br><span class="line">		Beq = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	LUI: <span class="keyword">begin</span></span><br><span class="line">		Lui = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	JAL: <span class="keyword">begin</span></span><br><span class="line">		Jal = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">endcase</span></span><br><span class="line">RegDst = Add | Sub;</span><br><span class="line">ALUSrc = Ori | Lw | Sw;</span><br><span class="line">MemtoReg = Lw;</span><br><span class="line">RegWrite = Add | Sub | Ori | Lw | Lui | Jal;</span><br><span class="line">MemWrite = Sw;</span><br><span class="line">beq = Beq;</span><br><span class="line">ExtOp = Lw | Sw;</span><br><span class="line">ALU_op = (Add | Lw | Sw | Lui | Jal | Jr) ? <span class="number">3&#x27;b000</span> :</span><br><span class="line">		 (Sub | Beq) ? <span class="number">3&#x27;b001</span> : <span class="number">3&#x27;b010</span>;</span><br><span class="line">lui = Lui;</span><br><span class="line">jal = Jal;</span><br><span class="line">jr = Jr;</span><br></pre></td></tr></table></figure></div>
+
+<p>对于第一种方法，可以方便地追踪各指令的控制信号配置，便于调试和扩展新指令；但一旦添加了新的控制信号，就需要修改所有指令的取值配置，维护起来比较繁琐。</p>
+<p>对于第二种方法，可以更直观地了解控制信号的构成，方便添加新的控制信号；不过在增加新指令时，就需要在多个地方修改，容易遗漏，从而引入 bug。</p>
+<h3 id="3、"><a href="#3、" class="headerlink" title="3、"></a>3、</h3><p>同步复位中，<code>clk</code>信号优先级比<code>reset</code>高，<code>reset</code>信号只有在时钟上升沿才有效；异步复位中，<code>reset</code>信号与<code>clk</code>信号优先级相同，<code>reset</code>信号在任何时刻都有效。</p>
+<h3 id="4、"><a href="#4、" class="headerlink" title="4、"></a>4、</h3><p>通过对比<code>addi</code>与<code>addiu</code>、<code>add</code>与<code>addu</code>的<code>Operation</code>部分可以发现，二者的主要区别在于溢出处理：<code>addi</code>和<code>add</code>在发生溢出时会触发<code>Integer Overflow</code>异常，而<code>addiu</code>和<code>addu</code>则不会。如果仅需支持C语言程序，那么可以不考虑溢出异常，此时<code>addi</code>与<code>addiu</code>可以视为等价，<code>add</code>与<code>addu</code>也同样等价。</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> P4_CPU设计文档</li>
+        <li><strong>Author:</strong> Zeng Yue</li>
+        <li><strong>Created at
+                :</strong> 2026-02-06 17:50:41</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2026-02-06 17:53:04
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://stratus-z.github.io/2026/02/06/P4-CPU设计文档/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a>.
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/CO/">#CO</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2026/02/06/P5-CPU%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">P5_CPU设计文档</span>
+						<span class="post-nav-item">Prev posts</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2026/02/06/P3-CPU%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">P3_CPU设计文档</span>
+						<span class="post-nav-item">Next posts</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        Comments
+    </div>
+    
+
+        
+            
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '/js/libs/waline.mjs';
+
+      function loadWaline() {
+        init({
+          el: '#waline',
+          serverURL: 'https://stratus-blog.vercel.app/',
+          dark: 'body[class~="dark-mode"]',
+          reaction: true,
+          requiredMeta: ['nick', 'mail'],
+          emoji: [],
+                    lang: 'zh-CN',
+        });
+      }
+
+      if (typeof swup !== 'undefined') {
+        loadWaline();
+      } else {
+        window.addEventListener('DOMContentLoaded', loadWaline);
+      }
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">P4_CPU设计文档</div>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81CPU%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3"><span class="nav-text">一、CPU设计文档</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E4%B8%80%EF%BC%89%E8%AE%BE%E8%AE%A1%E8%8D%89%E7%A8%BF"><span class="nav-text">（一）设计草稿</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E4%BA%8C%EF%BC%89%E6%B5%8B%E8%AF%95%E6%96%B9%E6%A1%88"><span class="nav-text">（二）测试方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%80%9D%E8%80%83%E9%A2%98"><span class="nav-text">二、思考题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81"><span class="nav-text">1、</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81"><span class="nav-text">2、</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81"><span class="nav-text">3、</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81"><span class="nav-text">4、</span></a></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2025</span>
+              -
+            
+            2026&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">Zeng Yue</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        8 posts in total
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">VISITOR COUNT</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">TOTAL PAGE VIEWS</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                Blog up for <span class="odometer" id="runtime_days" ></span> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Search..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>
