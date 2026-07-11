@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="Zeng Yue">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="https://stratus-z.github.io/2026/05/29/2026-buaa-oo-unit3总结/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2026北航面向对象Unit3总结">
+<meta property="og:url" content="https://stratus-z.github.io/2026/05/29/2026-BUAA-OO-Unit3%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="Stratus">
+<meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://stratus-z.github.io/images/redefine-og.webp">
+<meta property="article:published_time" content="2026-05-28T17:29:34.000Z">
+<meta property="article:modified_time" content="2026-07-11T16:52:44.787Z">
+<meta property="article:author" content="Zeng Yue">
+<meta property="article:tag" content="OO">
+<meta property="article:tag" content="反思总结">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://stratus-z.github.io/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/favicon.svg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.svg">
+    <meta name="theme-color" content="#A31F34">
+    <link rel="shortcut icon" href="/images/favicon.svg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            2026北航面向对象Unit3总结 | Stratus
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"stratus-z.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":"Hexo Theme Redefine, Redefine Your Hexo Journey."},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/wallhaven-rdoovj_1920x1080.png","dark":"/images/wallhaven-1pwmpg_1920x1080.png"},"title":"Stratus Blog","subtitle":{"text":["欢迎来到层云遮蔽下的空间。"],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"style":"default","links":{"github":"https://github.com/stratus-z","instagram":null,"zhihu":null,"twitter":null,"email":null},"qrs":{"weixin":"/images/weixin.png","qq":"/images/QQ.png"}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"11.4.1"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Tags":{"icon":"fa-solid fa-tags","path":"/tags/"},"Archives":{"path":"/archives/","icon":"fa-regular fa-archive"},"Categories":{"path":"/categories/","icon":"fa-regular fa-folder"},"About":{"icon":"fa-regular fa-user","submenus":{"Me":"/about/","Github":"https://github.com/stratus-z"}},"Links":{"icon":"fa-regular fa-link","path":"/links/"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":{"Tags":{"path":"/tags","icon":"fa-regular fa-tags"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2025/8/6 15:14:15"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                Stratus
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/tags/"
+                                        >
+                                    <i class="fa-solid fa-tags fa-fw"></i>
+                                    标签
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives/"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="has-dropdown"
+                                   href="#"
+                                        onClick=&#34;return false;&#34;>
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    关于
+                                    <i class="fa-solid fa-chevron-down fa-fw"></i>
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                                    <ul class="sub-menu">
+                                        
+                                            <li>
+                                                <a href="/about/">
+                                                    ME
+                                                </a>
+                                            </li>
+                                        
+                                            <li>
+                                                <a target="_blank" rel="noopener" href="https://github.com/stratus-z">
+                                                    GITHUB
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/links/"
+                                        >
+                                    <i class="fa-regular fa-link fa-fw"></i>
+                                    链接
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/tags/"
+                        >
+                            <span>
+                                标签
+                            </span>
+                            
+                                <i class="fa-solid fa-tags fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives/"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item-sub text-base my-1.5 flex flex-col w-full">
+                        
+                        <div class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary cursor-pointer text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                             navbar-data-toggle="submenu-About"
+                        >
+                            <span>
+                                关于
+                            </span>
+                            
+                                <i class="fa-solid fa-chevron-right fa-sm fa-fw transition-all"></i>
+                            
+                        </div>
+                        
+
+                        
+                            <div class="flex-col items-start px-2 py-2 hidden" data-target="submenu-About">
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           href="/about/">ME</a>
+                                    </div>
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           target="_blank" rel="noopener" href="https://github.com/stratus-z">GITHUB</a>
+                                    </div>
+                                
+                            </div>
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/links/"
+                        >
+                            <span>
+                                链接
+                            </span>
+                            
+                                <i class="fa-regular fa-link fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+                
+                    
+                    
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">6</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">1</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">20</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">2026北航面向对象Unit3总结</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">Zeng Yue</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv3</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2026-05-29 01:29:34</span>
+        <span class="mobile">2026-05-29 01:29:34</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2026-07-12 00:52:44</span>
+            <span class="mobile">2026-07-12 00:52:44</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E4%B8%93%E4%B8%9A%E8%AF%BE/">专业课</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/OO/">OO</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/%E5%8F%8D%E6%80%9D%E6%80%BB%E7%BB%93/">反思总结</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h2 id="一、对JML和规格驱动开发的理解"><a href="#一、对JML和规格驱动开发的理解" class="headerlink" title="一、对JML和规格驱动开发的理解"></a>一、对JML和规格驱动开发的理解</h2><p>Unit3的作业不同于前面两个单元的根据自然语言描述来设计和实现程序，而是要求我们根据JML的规范来设计和实现程序，官方包中会给出用JML规格来描述的接口，我们需要根据这些接口来设计和实现程序。因此在这个单元中，我首先需要理解JML的语法和语义，了解如何使用JML来描述接口的行为和约束条件，以及如何使用JML来进行程序的验证和测试。</p>
+<p>对于JML的理解，我认为它是一种非常有用的工具，它有一个非常清晰的逻辑结构，有前置条件<code>requires</code>、后置条件<code>ensures</code>、副作用范围<code>assignable</code>等关键字来描述接口的行为和约束条件，同时还有<code>normal_behavior</code>、<code>exceptional_behavior</code>等关键字来描述接口的正常行为和异常行为。这些关键字的使用使得接口的设计和实现更加清晰和规范，能够让开发者很明确地知道接口的预期行为和约束条件，从而能够更好地设计和实现程序。同时，根据JML描述的接口也能够很快的进行程序的验证和测试，通过针对性的检查接口的前置条件、后置条件和副作用范围等来验证程序的正确性和健壮性。</p>
+<p>而这种规格驱动开发的方法也使得程序的开发过程更加系统化和规范化，它能够消除自然语言在功能描述上的歧义和不确定性，使得开发者能够更清晰地理解接口的预期行为和约束条件，从而能够更好地设计和实现程序。同时，使用JML来描述接口也能实现在设计和实现上的分离，使得开发者能够在设计阶段就明确接口的预期行为和约束条件，从而能够更好地指导实现阶段的开发工作，并且不限制实现的细节和方法，从而能够更好地发挥开发者的创造力和灵活性。</p>
+<p>在三次作业中，我根据官方包中给出的JML规格来设计和实现程序。在实现时，对于<code>model</code>修饰的数据成员，我可以选择不同种的数据类型来实现，从中挑选满足需求的最佳实现方式来实现接口的功能。而对于<code>pure</code>修饰的方法，我需要保证它们的纯函数性质，即不修改任何数据成员的值，但对于我自行额外添加的数据成员，我可以选择是否在这些方法中维护它们。总体而言，JML规格描述给了我一个非常明确的前提和目标，而对于实现细节，我可以自行探索时间复杂度尽可能低的实现方式来实现接口的功能，这种设计和实现上的分离使得我能够更好地发挥创造力和灵活性来设计和实现程序。</p>
+<h2 id="二、JUnit测试经验"><a href="#二、JUnit测试经验" class="headerlink" title="二、JUnit测试经验"></a>二、JUnit测试经验</h2><p>本单元的每次作业都要求我们设计特定的JUnit测试用例来验证程序的正确性和健壮性，但与OOP的覆盖率测试不同，这个单元的JUnit测试主要是要求针对某个方法设计全面的测试，不只是测试方法的返回值，还要测试方法的行为是否符合JML规格的约束条件，例如测试方法的前置条件、后置条件和副作用范围等是否满足规格的要求。因此在设计JUnit测试用例时，我需要仔细分析JML规格中对于接口的描述，并充分利用JML规格中提供的约束来设计测试用例，确保测试的全面性和有效性。</p>
+<p>第一次作业要求测试<code>queryMutualFollowingSum</code>方法，官方评测的<code>User</code>类会提供<code>boolean strictEquals(UserInterface user)</code>方法，<code>Network</code>类提供<code>UserInterface[] getUsers()</code>方法供同学们调用。但是由于<code>getUsers()</code>方法使用的是浅拷贝，因此如果直接在测试<code>queryMutualFollowingSum</code>方法前调用<code>getUsers()</code>方法来获取旧的用户列表并用于后续检测需要自行实现深拷贝。由于<code>User</code>对象间复杂的相互关系，深拷贝的实现比较麻烦，所以我在测试时添加了一个与待测试的<code>Network</code>对象并行的“影子”<code>Network</code>对象，在对待测试的<code>Network</code>对象进行初始化操作时也对“影子”<code>Network</code>对象进行相同的初始化操作，这样就能够保证“影子”<code>Network</code>对象中的用户列表和待测试的<code>Network</code>对象中的用户列表是完全相同的。然后在测试<code>queryMutualFollowingSum</code>方法时，我就可以直接调用“影子”<code>Network</code>对象中的用户列表来进行检测，结合<code>strictEquals</code>方法便能十分全面的检测<code>User</code>对象的相关属性是否发生了不符合规格要求的改变，既保证了测试的全面性和有效性，又避免了深拷贝的复杂实现。</p>
+<p>第二次作业要求测试<code>clean_spam_comments</code>方法，官方评测的<code>Video</code>类会提供<code>int[] getCommentIds()</code>方法和<code>String[] getCommentContents()</code>方法，这两个方法都是以深拷贝实现的，因此检测方法的副作用范围时可以直接调用这两个方法来获取旧的评论列表和评论内容列表来进行检测，不需要额外实现深拷贝。因此直接设计不同的数据来测试<code>clean_spam_comments</code>方法的多种情况即可检测方法的正常行为的正确性，最后再设计一些数据来测试<code>clean_spam_comments</code>方法的异常行为的正确性即可。</p>
+<p>第三次作业要求测试<code>recommend_Nth_up</code>方法，这次官方和第一次一样提供了<code>UserInterface[] getUsers()</code>方法来获取用户列表，并且同样使用了浅拷贝，因此我继续使用了之前设计的“影子”<code>Network</code>对象来进行检测，保证测试的全面性和有效性。但是这次测试的方法的异常行为比较复杂，会抛出<code>UserIdNotFoundException</code>，<code>InvalidRankException</code>，<code>NoVideoUploadedException</code>，<code>ColdStartUserException</code>等多种异常，而抛出异常的优先级还有限制，因此在设计测试用例时需要仔细分析这些异常的抛出条件和优先级，设计不同的数据来测试这些异常的正确抛出，确保测试的全面性和有效性。</p>
+<p>在这些JUnit测试的设计过程中，我感受到了JML规格的约束对于测试设计的指导作用，JML规格中对于接口的前置条件、后置条件和副作用范围等的描述为我设计测试用例提供了非常明确的指导，根据这些约束条件，我可以编写对应的<code>assert</code>语句来验证程序的行为是否符合规格的要求，从而确保测试的全面性和有效性。同时，在设计测试用例时，我可以借助JML规格来设计一些边界情况和异常情况的测试用例，确保程序在各种情况下都能够正确地处理输入并抛出相应的异常，从而提高程序的健壮性和可靠性。</p>
+<h2 id="三、迭代过程"><a href="#三、迭代过程" class="headerlink" title="三、迭代过程"></a>三、迭代过程</h2><h3 id="1、第一次作业"><a href="#1、第一次作业" class="headerlink" title="1、第一次作业"></a>1、第一次作业</h3><p>这次作业从0起步，由于初步接触JML规格描述，所以我基本是按照JML规格的描述来设计和实现程序的功能，对于数据结构大多使用的最简单的<code>ArrayList</code>来实现，虽然实现比较简单，但是性能较差。因此在考虑性能后，对于部分不关注顺序的存储，我改用了<code>HashSet</code>和<code>HashMap</code>来实现，优化了查找和写入的性能，对于需要保持顺序且要频繁进行头部插入的存储<code>receivedVideos</code>，我改用了<code>LinkedList</code>来实现，优化了头部插入的性能。</p>
+<p>在这次作业中，要求实现的<code>queryMutualFollowingSum</code>和<code>queryShortestPath</code>方法有比较多的可优化空间。在实现<code>queryMutualFollowingSum</code>方法时，为了避免过多的循环遍历来计算互相关注的数量，我在<code>Network</code>类中维护了一个<code>mutualFollowingSum</code>的属性来记录每个用户的互相关注数量，在每次进行关注和取关操作时都更新这个属性，这样在查询时就能够直接返回这个属性的值来得到结果，优化了性能。在实现<code>queryShortestPath</code>方法时，我使用了广度优先搜索的方法来计算最短路径，并且在搜索过程中使用了一个<code>visited</code>集合来记录已经访问过的用户，避免重复访问导致的性能问题。同时，在<code>queryAgeRatio</code>方法中，我在<code>User</code>类中维护了四个属性来记录不同年龄段的关注者数量，在每次进行关注和取关操作时都更新这些属性，这样在查询时就能够直接返回这些属性的值来计算年龄比，避免了重复的循环。</p>
+<h3 id="2、第二次作业"><a href="#2、第二次作业" class="headerlink" title="2、第二次作业"></a>2、第二次作业</h3><p>第二次作业在第一次作业的基础上添加了点赞、评论、清理垃圾评论等功能。根据题目文档的标注和JML描述的改变，便能发现已有方法和容器的改变，这次作业大部分的数据结构和实现方式都可以沿用第一次作业的设计。而新增的功能中，普通的互动功能的实现比较简单，借助之前设计好的数据结构基本都能够简单地实现并且时间复杂度低。但是对于<code>clean_spam_comments</code>方法的实现就比较麻烦了，它需要遍历视频的评论列表来清理垃圾评论，而在遍历每一条评论时又需要对整个字符串评论进行垃圾评论的检测，由于需要统计垃圾<code>keyword</code>在评论中出现的次数，对于整个字符串的逐字符遍历不可避免，因此时间复杂度较高。但由于我自身能力的不足，这里我并未进行优化。</p>
+<p>但是在本次要求实现的另一个方法<code>queryBestContributor</code>中，我通过在<code>User</code>类中维护一个<code>bestContributor</code>属性来记录当前的最佳贡献者，这样在查询时就能够直接返回这个属性的值来得到结果，只需要在每次进行点赞和评论操作时更新这个属性来保证它的正确性，这样就能够优化查询的性能。</p>
+<h3 id="3、第三次作业"><a href="#3、第三次作业" class="headerlink" title="3、第三次作业"></a>3、第三次作业</h3><p>这次迭代在第二次作业的基础上添加了视频推荐和up主推荐的功能。若继续在<code>Network</code>类中直接实现这些新增的方法，会导致整个<code>Network</code>类过于臃肿，因此我设计了一个新的类<code>NetworkHelper</code>来统一实现<code>Network</code>类中的一些复杂的查询方法，这样就能够将这些复杂的查询方法与<code>Network</code>类中的其他方法进行分离，避免了<code>Network</code>类过于臃肿，同时也能够更好地组织和管理这些复杂的查询方法。</p>
+<p>为了优化整体的性能，我继续在<code>Network</code>类中维护了许多缓存变量用来存储一些需要大量操作来计算的结果，并设置了一些辅助方法来更新和维护这些缓存变量的正确性，这样在查询时就能够直接返回这些缓存变量的值来得到结果，优化了性能。为了减少<code>User</code>对象的<code>getInfluence</code>方法中过多的遍历统计，我在<code>User</code>类中维护了一个<code>influences</code>属性来记录用户在不同类型领域的影响力，在每次进行影响<code>influence</code>的操作时都更新这个属性来保证它的正确性。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>在每次迭代时，认真阅读平台的题目，根据<code>Modify</code>标注可以初步找到方法上的变更，再仔细阅读JML规格的描述，分析方法的要求，能进一步找出变更了的方法并进行相应的修改。对于这些性能瓶颈，我主要是在阅读了JML规格的描述后，分析了方法的要求后，考虑到如果需要进行较多的循环遍历来计算结果，就可以考虑选用高性能的数据结构来存储相关的数据，或者在类中维护一些额外的属性来记录相关的统计数据，在每次进行相关操作时都更新这些属性，这样在查询时就能够直接返回这些属性的值来得到结果，从而优化性能。</p>
+<h2 id="四、bug分析"><a href="#四、bug分析" class="headerlink" title="四、bug分析"></a>四、bug分析</h2><p>在这三次作业中，我基本都很顺利的通过了强测和互测，程序的逻辑正确性基本没有问题，但在第二次作业的第一次强测中，我的程序由于在<code>clean_spam_comments</code>方法中设计的算法的时间复杂度过高而导致了超时的bug，虽然在第二次强测中又通过了，但这依旧说明了该方法的性能问题比较严重。按照助教和其他同学的提示，可以在则会个方法中使用<code>KMP</code>算法来优化字符串的匹配，从而降低时间复杂度，理论上可以优化这个方法的性能，但由于我自身能力的不足，这里我并未进行优化。</p>
+<p>而在第三次作业的互测中，通过hack其他人的代码我发现了一个比较隐蔽的bug，就是在部分需要循环遍历来寻找最佳的用户或者视频的算法中，如果暂存的为<code>Id</code>而不是对象，且暂存用的载体初始化为-1，就可能出现与实际<code>Id</code>为-1的用户或者视频进行比较时冲突的情况，导致程序出现错误的结果。这个bug比较隐蔽，因为在测试数据中可能并没有<code>Id</code>为-1的用户或者视频，因此在强测中都没有暴露出来。但是在互测中，由于测试数据的多样性，我发现了自己的程序也存在这一样的bug。但是要修复这个bug其实也很简单，由于这些方法实现的基本都是在某个特定值相等的情况下就比较<code>Id</code>，因此只需要将暂存的载体初始化为一个不太可能出现的值或者出现了也没有影响的值即可，例如<code>Integer.MAX_VALUE</code>，这样就能够避免冲突的情况，从而修复这个bug。</p>
+<h2 id="五、大模型使用体会"><a href="#五、大模型使用体会" class="headerlink" title="五、大模型使用体会"></a>五、大模型使用体会</h2><p>在这个单元里，由于使用JML规格来设计和实现程序，程序的逻辑结构比较清晰，因此在完成作业时当我使用大模型来实现某些方法时，它会比较严格的按照JML规格的描述来实现方法的功能，对于方法的结果和操作等方面的正确性都能够得到保证，但是由于大模型的能力有限，对于一些方法的性能优化它就无法给出很好的建议，因此在性能优化方面我还是需要自己来分析和设计来优化程序的性能。</p>
+<p>对于一些较为基础的优化，如选择合适的数据结构来存储数据，大模型还是能够给出一些不错的建议的。但是如果涉及对性能的压榨，如添加一些额外的缓存属性来记录一些统计数据来优化性能，大模型往往不会自己想到，但在我们人为的引导和约束下，大模型还是能完成我们预期的设计的。</p>
+<p>在进行单元测试时，大模型也能够根据JML规格的描述来设计一些比较全面的测试用例来测试程序的正确性和健壮性，并且能够及其严格的检测程序的行为是否符合JML规格的约束条件，例如测试方法的前置条件、后置条件和副作用范围等是否满足规格的要求，从而确保测试的全面性和有效性。这种能力对于我们实现单元测试来讲是非常有帮助的。</p>
+<h2 id="六、JML“击鼓传花”感悟"><a href="#六、JML“击鼓传花”感悟" class="headerlink" title="六、JML“击鼓传花”感悟"></a>六、JML“击鼓传花”感悟</h2><p>在这个单元的第二次研讨课上，课程组为我们设计了一个“击鼓传花”的活动，要求我们实现一个“NL-&gt;JML-&gt;NL-&gt;JML-&gt;NL-&gt;JML”的传递过程来实现信息的传递和转换，并且全程不可使用AI来辅助。虽然由于时间原因我们只完成了“NL-&gt;JML-&gt;NL-&gt;JML”的传递过程，但我觉得这个活动的设计还是非常有意义的，它能够让我们更好地理解和掌握JML规格的描述和使用，同时也能够锻炼我们的信息传递和转换能力。</p>
+<p>在传递的过程中，对于才接触JML规格一个单元的我们来说，非常容易写出一些不符合JML规格要求的描述，或者漏掉一些JML规格中要求的约束条件。在描述状态变更（如<code>size == \old(size) + 1</code>）时，很多同学（包括我自己）在初始阶段容易忘记给被修改的变量加上<code>\old</code>，导致后置条件变成了恒等式或逻辑错误；或者在<code>\forall</code>遍历旧数组时，忘记对数组元素使用<code>\old(elements[i])</code>。有时为了省事，有人会忘记写副作用声明，或者错误地理解了NL，写出了<code>assignable \everything</code>。这在契约式编程中是极其危险的，意味着方法可以随意篡改对象状态。</p>
+<p>同时，在传递过程中，我们也生动的演绎了“有损压缩”，发生了业务与边界的畸变，导致后续的JML规格描述出现了逻辑错误或者不完整的情况。例如最初的NL中有<code>null</code>检查，在第一次转化为JML时可能就被疏忽了。一旦JML中没有体现，下一轮接手的同学翻译回NL时，这些边界条件就彻底在链条上“蒸发”了。再者，当拿到一段晦涩的JML时，人类的大脑会习惯性地进行“业务脑补”。比如，原本JML只是要求“返回数组中的最大值”，下一位同学在写NL时，不仅写了找最大值，还加上了“并将数组升序排列”的副作用。这种“画蛇添足”导致下一轮的JML越来越长，最终偏离初衷。</p>
+<p>这次“击鼓传花”的小游戏也给了我一些启示。这场游戏其实是现实多人协同开发的缩影。在今后的多人组队编程中，为了统一对任务需求和实现方法的理解，我认为必须采取一些硬性措施：</p>
+<ul>
+<li>推行“契约式设计”作为沟通基准。不要用纯自然语言聊天来确认需求，在开始敲代码前，组内成员应当共同制定接口定义，并用类似JML的形式化&#x2F;半形式化规范固定下来。代码未动，规格先行，让所有的讨论都基于“契约”展开，而不是基于个人的“主观阅读理解”。</li>
+<li>制定统一的“领域词汇表”。在组队初期，建立一个共享文档，统一业务名词的含义。例如，“缓存”具体是指加入到哪个特定的数据结构？“非法输入”具体抛出哪个自定义异常？消除自然语言的二义性，确保张三说的“更新状态”和李四理解的“更新状态”是同一套底层逻辑。</li>
+<li>强制执行交叉Code Review。就像游戏中最后的“下一组评审打分”环节一样。写规格的人和写实现代码的人不能完全闭门造车。通过相互Review，重点检查代码的实现是否与规格逻辑同构，是否出现了过度设计或边界遗失。</li>
+<li>用单元测试作为可执行的“需求文档”。测试用例是对需求最客观的翻译。团队可以由一名同学专门根据需求编写针对边界条件（如空图、自环、孤立点等）的黑盒测试用例。只要全组的代码都能跑通这同一套测试用例，就说明大家对需求的理解在代码层面达成了事实上的统一，从而最大程度降低信息差带来的灾难。</li>
+</ul>
+<p>总之，“传声筒”游戏让我们意识到，自然语言是感性且发散的，而代码是理性且收敛的。JML正是这二者之间的桥梁。优秀的团队协作，不仅需要顺畅的口头沟通，更需要将沟通成果转化为不可篡改的“形式化契约”。</p>
+<h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><p>这个单元相比于前两个单元，难度确实降低了不少。这一方面是由于本单元要求实习的功能并不是很复杂，另一方面是由于JML规格的描述使得程序的逻辑结构比较清晰，开发过程中不太容易出现逻辑错误，因此在强测和互测中基本没有出现bug了，只是对于方法的具体实现细节和性能优化还需要人为的思考和打磨。回首Unit 3的三次迭代，我真正领悟了“规格驱动开发”的工程价值。JML契约将模糊的自然语言需求转化为严格的逻辑边界，让我的设计思维从简单的“组织类与方法”升华为“管理契约、状态与复杂度”。我深刻意识到，优秀的实现绝不是对JML的机械翻译，而是在严格恪守外部行为承诺的前提下，灵活运用增量维护、状态缓存和图论算法来突破性能瓶颈。配合基于规格的单元测试闭环，全面验证正常与异常路径，让我在面对复杂的系统演进时也能游刃有余。没有清晰的契约，迭代就会沦为bug的温床；而这种“代码未动，规格先行”的契约式工程思想，将成为我未来应对复杂开发的坚实基石。</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> 2026北航面向对象Unit3总结</li>
+        <li><strong>作者:</strong> Zeng Yue</li>
+        <li><strong>创建于
+                :</strong> 2026-05-29 01:29:34</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2026-07-12 00:52:44
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://stratus-z.github.io/2026/05/29/2026-BUAA-OO-Unit3总结/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/OO/">#OO</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E5%8F%8D%E6%80%9D%E6%80%BB%E7%BB%93/">#反思总结</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2026/06/04/Lab6%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Lab6实验报告</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2026/05/28/Lab5%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Lab5实验报告</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '/js/libs/waline.mjs';
+
+      function loadWaline() {
+        init({
+          el: '#waline',
+          serverURL: 'https://stratus-blog.vercel.app/',
+          dark: 'body[class~="dark-mode"]',
+          reaction: true,
+          requiredMeta: ['nick', 'mail'],
+          emoji: [],
+                    lang: 'zh-CN',
+        });
+      }
+
+      if (typeof swup !== 'undefined') {
+        loadWaline();
+      } else {
+        window.addEventListener('DOMContentLoaded', loadWaline);
+      }
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">2026北航面向对象Unit3总结</div>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%AF%B9JML%E5%92%8C%E8%A7%84%E6%A0%BC%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-text">一、对JML和规格驱动开发的理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81JUnit%E6%B5%8B%E8%AF%95%E7%BB%8F%E9%AA%8C"><span class="nav-text">二、JUnit测试经验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%BF%AD%E4%BB%A3%E8%BF%87%E7%A8%8B"><span class="nav-text">三、迭代过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81%E7%AC%AC%E4%B8%80%E6%AC%A1%E4%BD%9C%E4%B8%9A"><span class="nav-text">1、第一次作业</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E7%AC%AC%E4%BA%8C%E6%AC%A1%E4%BD%9C%E4%B8%9A"><span class="nav-text">2、第二次作业</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81%E7%AC%AC%E4%B8%89%E6%AC%A1%E4%BD%9C%E4%B8%9A"><span class="nav-text">3、第三次作业</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81bug%E5%88%86%E6%9E%90"><span class="nav-text">四、bug分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BD%BF%E7%94%A8%E4%BD%93%E4%BC%9A"><span class="nav-text">五、大模型使用体会</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81JML%E2%80%9C%E5%87%BB%E9%BC%93%E4%BC%A0%E8%8A%B1%E2%80%9D%E6%84%9F%E6%82%9F"><span class="nav-text">六、JML“击鼓传花”感悟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%80%BB%E7%BB%93"><span class="nav-text">七、总结</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2025</span>
+              -
+            
+            2026&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">Zeng Yue</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 20 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>
